@@ -241,7 +241,7 @@
 <div class="frame" id="frame">
 
   <!-- ════════ 계산 ════════ -->
-  <section class="view active" id="view-calc">
+  <section class="view" id="view-calc">
     <div class="hd">
       <div class="kicker">Electronic Tongue · 맛 튜닝 계산기</div>
       <div class="row">
@@ -313,7 +313,7 @@
   </section>
 
   <!-- ════════ 탐색 ════════ -->
-  <section class="view" id="view-explore">
+  <section class="view active" id="view-explore">
     <div class="hd">
       <div class="kicker">Taste Engine · 배합 시뮬레이터</div>
       <div class="row">
@@ -366,9 +366,9 @@
 
   <!-- 하단 네비 -->
   <nav class="nav" id="nav">
-    <button data-view="calc" class="on"><span class="ic">🧮</span><span class="tx">계산</span></button>
+    <button data-view="explore" class="on"><span class="ic">🎚️</span><span class="tx">탐색</span></button>
+    <button data-view="calc"><span class="ic">🧮</span><span class="tx">계산</span></button>
     <button data-view="fix"><span class="ic">🩹</span><span class="tx">보정</span></button>
-    <button data-view="explore"><span class="ic">🎚️</span><span class="tx">탐색</span></button>
     <button data-view="saved"><span class="ic">★</span><span class="tx">저장</span></button>
   </nav>
   <div class="bubble" id="styleBubble"></div>
@@ -416,7 +416,14 @@ const COND = {
   water:{name:"물",density:1.0},
   milk_or_cream:{name:"우유/크림",fatEq:0.2,sweetEq:0.05,density:1.0},
   cheese:{name:"치즈",saltEq:0.05,fatEq:0.3,umami:3,density:1.05},
-  gochujang_or_ketchup:{name:"고추장/케첩",saltEq:0.04,sweetEq:0.2,acidEq:0.08,umami:2,spice:2,density:1.15}
+  gochujang_or_ketchup:{name:"고추장/케첩",saltEq:0.04,sweetEq:0.2,acidEq:0.08,umami:2,spice:2,density:1.15},
+  // ── 유명 기성 감칠맛 조미료 ──
+  dasida:{name:"다시다",saltEq:0.40,sweetEq:0.05,umami:6,density:0.65},
+  yeondu:{name:"연두",saltEq:0.12,umami:5,density:1.1},
+  miwon:{name:"미원·미풍(MSG)",saltEq:0.08,umami:6,density:0.8},
+  matsogeum:{name:"맛소금",saltEq:0.9,umami:2,density:1.05},
+  tsuyu:{name:"쯔유(멘쯔유)",saltEq:0.10,sweetEq:0.08,umami:4,density:1.1},
+  chicken_stock:{name:"치킨스톡",saltEq:0.35,umami:5,density:0.6}
 };
 const C = id => COND[id] || {name:id,density:1.0};
 
@@ -542,6 +549,9 @@ function calcRecipe(state){
 
     // 3) 측정축 없는 향/감칠/매콤 보조
     if(rec.includes("dashi") && prof.umami>=4) add("dashi", w*0.05, "middle");
+    // 유명 기성 감칠맛 조미료 한 꼬집 (양식 제외) — 다시다/연두
+    if(prof.umami>=4 && !["gordon_ramsay","fine_dining"].includes(style.id) && !ings.some(i=>["dasida","yeondu","oyster_sauce","fish_sauce"].includes(i.id)))
+      add(style.id==="choi_kangrok"?"yeondu":"dasida", w*0.005, "middle");
     if(rec.includes("chili_powder")) add("chili_powder", w*0.008*intMul("spice",mode), "middle");
     if(rec.includes("sesame")) add("sesame", w*0.01, "finish");
     if(rec.includes("herbs")) add("herbs", Math.max(0.3,w*0.004), "finish");
@@ -687,14 +697,16 @@ function nearestCombos(t,combos,n=2){const dist=v=>Math.sqrt(TASTES.reduce((a,{k
 function suggestGolden(target){let best={...target},bestScore=deliciousness(best);
   for(let i=0;i<60;i++)for(const{key}of TASTES)for(const d of[-0.5,0.5]){const cand={...best,[key]:Math.max(0,Math.min(10,best[key]+d))};const s=deliciousness(cand);if(s>bestScore){best=cand;bestScore=s;}}return{vector:best,score:bestScore};}
 const PRODUCT_COMBOS=[
+ {name:"쇠고기 다시다 + 국간장",ratio:"1 : 2",dish:"감칠 국·찌개",v:{salt:8,sweet:1,sour:0,umami:9,spicy:0}},
+ {name:"연두 + 들기름",ratio:"2 : 1",dish:"나물 무침·맑은국",v:{salt:6,sweet:2,sour:0,umami:8,spicy:0}},
+ {name:"미원·미풍 + 소금",ratio:"1 : 3",dish:"만능 감칠 소금간",v:{salt:8,sweet:0,sour:0,umami:8,spicy:0}},
+ {name:"굴소스 + 다시다",ratio:"2 : 1",dish:"감칠 볶음·볶음밥",v:{salt:8,sweet:3,sour:0,umami:10,spicy:0}},
+ {name:"쯔유(멘쯔유) 희석",ratio:"원액 : 물 1 : 3",dish:"장국·계란말이·덮밥",v:{salt:7,sweet:5,sour:1,umami:8,spicy:0}},
+ {name:"치킨스톡 큐브",ratio:"1알 : 물 2컵",dish:"수프·리조또·볶음밥",v:{salt:8,sweet:2,sour:0,umami:8,spicy:0}},
+ {name:"맛소금",ratio:"솔솔",dish:"구이·튀김 밑간",v:{salt:9,sweet:0,sour:0,umami:3,spicy:0}},
  {name:"만능간장 + 굴소스",ratio:"2 : 1",dish:"만능 볶음장",v:{salt:8,sweet:4,sour:1,umami:9,spicy:0}},
- {name:"간장 + 설탕 + 다진마늘",ratio:"3 : 1 : 0.5",dish:"불고기 양념",v:{salt:7,sweet:6,sour:1,umami:6,spicy:1}},
  {name:"고추장 + 물엿 + 식초",ratio:"2 : 1 : 1",dish:"초고추장",v:{salt:5,sweet:7,sour:6,umami:5,spicy:5}},
- {name:"된장 + 고추장",ratio:"2 : 1",dish:"쌈장 베이스",v:{salt:7,sweet:3,sour:1,umami:8,spicy:4}},
- {name:"굴소스 + 스리라차",ratio:"2 : 1",dish:"매콤 볶음",v:{salt:7,sweet:3,sour:2,umami:8,spicy:7}},
  {name:"마요 + 스리라차 + 꿀",ratio:"3 : 1 : 0.5",dish:"마약 디핑소스",v:{salt:3,sweet:5,sour:3,umami:3,spicy:6}},
- {name:"간장 + 식초 + 설탕",ratio:"2 : 2 : 1",dish:"새콤달콤 무침",v:{salt:6,sweet:6,sour:7,umami:4,spicy:1}},
- {name:"케첩 + 마요",ratio:"1 : 1",dish:"분식 소스",v:{salt:4,sweet:6,sour:4,umami:3,spicy:1}},
  {name:"고추장+간장+설탕+고춧가루",ratio:"2:1:1:0.5",dish:"제육 양념",v:{salt:7,sweet:6,sour:1,umami:6,spicy:8}},
  {name:"굴소스 + 간장 + 설탕",ratio:"2 : 1 : 1",dish:"감칠 볶음밥",v:{salt:8,sweet:5,sour:1,umami:9,spicy:0}}];
 const EXPLORE_PRESETS=[{label:"단짠하게",target:{salt:6,sweet:5,sour:1,umami:6,spicy:0}},{label:"칼칼하게",target:{salt:6,sweet:3,sour:2,umami:6,spicy:6}},
@@ -912,7 +924,7 @@ function goCalcWithStyle(id){
   $("view-calc").classList.add("active");
   window.scrollTo(0,0);
 }
-let _bubbleTO=null, _lastMatchId=null;
+let _bubbleTO=null, _lastMatchId=null, _bubbleArmed=false;
 function showBubble(style, gold){ const b=$("styleBubble"); if(!b)return;
   b.className="bubble show"+(gold?" gold":"");
   b.innerHTML=`<div class="bbl-t">${gold?"★ 존맛존 · ":""}이 맛 ≈ ${style.name}</div><div class="bbl-s">탭하면 이 맛으로 계산하기 →</div>`;
@@ -935,14 +947,14 @@ function renderExplore(){
   const combos=nearestCombos(t,PRODUCT_COMBOS,2);
   $("combos").innerHTML=combos.map((c,i)=>`<div class="combo ${i===0?'first':''}"><div><div class="cn">${c.name}</div><div class="cd">${c.dish}</div></div><div class="cr">${c.ratio}</div></div>`).join("");
   // 조건 만족 시(가까운 맛 스타일) 말풍선 잠깐 표시
-  if($("view-explore").classList.contains("active")){
+  if(_bubbleArmed && $("view-explore").classList.contains("active")){
     const ns=nearestStyle(t);
     if(ns && ns.dist<=3.0){ if(ns.style.id!==_lastMatchId){ _lastMatchId=ns.style.id; showBubble(ns.style, isGold); } }
     else _lastMatchId=null;
   }
   morphRadar();
 }
-renderExplore(); drawRadarValue(displayVec,isGold);
+renderExplore(); drawRadarValue(displayVec,isGold); _bubbleArmed=true;
 </script>
 </body>
 </html>
