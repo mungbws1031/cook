@@ -511,6 +511,7 @@ const TEMPLATES = {
 function spoonStr(g, density){
   const ml = g / (density || 1.0);
   if (ml < 2.5) return "약간";
+  if (ml >= 150) return fmtNum(round05(ml/200)) + "컵";   // 국물 등 큰 부피는 컵(200ml)으로
   let tsp = round05(ml/5);              // 작은술(5ml) 단위로 반올림
   let tbsp = Math.floor(tsp/3);         // 1큰술 = 3작은술(15ml)
   let rem = round05(tsp - tbsp*3);
@@ -603,6 +604,11 @@ function calcRecipe(state){
     steps = buildSteps(ings);
   }
 
+  // 국·찌개는 국물(물) 양도 함께 안내
+  if(state.categoryId==="soup" || state.categoryId==="stew"){
+    const wf = state.categoryId==="soup" ? 0.8 : 0.55;
+    ings.unshift({id:"water", name:"물(육수)", amountG: Math.round(w*wf/10)*10, timing:"early", density:1.0});
+  }
   const eq = eqSums(ings);
   const taste = tasteAxis(w, eq, cat, style);
   const zon = scoreZon(w, eq, Object.assign({}, cat, style.over||{}), ings);
@@ -660,6 +666,7 @@ function buildSteps(ings){
 function buildWarnings(state, ings, cat, style){
   const w=[]; const wt=state.foodWeightG;
   if(wt>=2000) w.push({stop:false,t:"대량 조리예요. 간은 80%만 먼저 넣고 맛보며 추가하세요."});
+  if(state.categoryId==="soup"||state.categoryId==="stew") w.push({stop:false,t:"국물은 끓이면 졸아 짜져요. 물을 먼저 넉넉히 잡고, 간은 다 끓인 뒤 맞추세요."});
   if(ings.some(i=>["soy_sauce","salt","fish_sauce","low_sodium_soy_sauce","oyster_sauce","doenjang"].includes(i.id)))
     w.push({stop:false,t:"짠 양념(간장·소금·액젓)은 처음에 80%만 넣고 맛보며 조절하세요."});
   if(ings.some(i=>["vinegar","lemon_juice","lime_juice"].includes(i.id)))
@@ -813,8 +820,8 @@ function renderCalcResult(r){
   const total=seasonings.reduce((a,i)=>a+i.amountG,0)||1;
   const blendBar=seasonings.map(i=>`<span style="width:${i.amountG/total*100}%;background:${condColor(i.id)}" title="${i.name} ${fmtG(i.amountG)}g"></span>`).join("");
   const ingRows=r.ingredients.map(it=>{
-    const tlabel={early:"향내기·먼저",middle:"간하기·중간",finish:"마무리"}[it.timing]||"";
-    const sub=(it.id==="water"||it.id==="starch_water")?" sub":"";
+    const tlabel = it.id==="water" ? "국물 베이스" : ({early:"향내기·먼저",middle:"간하기·중간",finish:"마무리"}[it.timing]||"");
+    const sub=(it.id==="starch_water")?" sub":"";
     return `<div class="ing${sub}"><div class="l"><span class="cdot" style="background:${condColor(it.id)}"></span><div><div class="nm">${it.name}</div><div class="tm ${it.timing}">${tlabel}</div></div></div>
       <div class="r"><div class="g">${fmtG(it.amountG)}<small>g</small></div><div class="sp">🥄 ${spoonStr(it.amountG,it.density)}</div></div></div>`;
   }).join("");
