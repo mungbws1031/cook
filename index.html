@@ -429,13 +429,13 @@ const C = id => COND[id] || {name:id,density:1.0};
 
 const CATEGORIES = [
   {id:"soup",name:"국/탕",saltPct:[0.6,0.8],sweetPct:[0,0.3],acidPct:[0,0.2],fatPct:[0,3],umami:4},
-  {id:"stew",name:"찌개",saltPct:[0.8,1.0],sweetPct:[0,0.5],acidPct:[0,0.5],fatPct:[1,5],umami:5},
-  {id:"stir_fry",name:"볶음",saltPct:[0.9,1.3],sweetPct:[1,4],acidPct:[0,0.8],fatPct:[3,8],umami:4},
+  {id:"stew",name:"찌개",saltPct:[0.8,1.0],sweetPct:[0,0.5],acidPct:[0,0.3],fatPct:[1,5],umami:5},
+  {id:"stir_fry",name:"볶음",saltPct:[0.9,1.3],sweetPct:[1,4],acidPct:[0,0.4],fatPct:[3,8],umami:4},
   {id:"muchim",name:"무침",saltPct:[0.9,1.2],sweetPct:[1,3],acidPct:[0,3],fatPct:[1,3],umami:3},
-  {id:"braise",name:"조림",saltPct:[1.0,1.5],sweetPct:[3,8],acidPct:[0,0.5],fatPct:[1,5],umami:5},
-  {id:"grill",name:"구이",saltPct:[0.8,1.2],sweetPct:[0,2],acidPct:[0,1],fatPct:[5,15],umami:3},
-  {id:"rice_bowl",name:"덮밥/밥",saltPct:[0.8,1.2],sweetPct:[1,4],acidPct:[0,0.8],fatPct:[3,8],umami:4},
-  {id:"noodle_pasta",name:"면/파스타",saltPct:[0.8,1.2],sweetPct:[0,3],acidPct:[0,2],fatPct:[5,15],umami:4},
+  {id:"braise",name:"조림",saltPct:[1.0,1.5],sweetPct:[3,8],acidPct:[0,0.3],fatPct:[1,5],umami:5},
+  {id:"grill",name:"구이",saltPct:[0.8,1.2],sweetPct:[0,2],acidPct:[0,0.5],fatPct:[5,15],umami:3},
+  {id:"rice_bowl",name:"덮밥/밥",saltPct:[0.8,1.2],sweetPct:[1,4],acidPct:[0,0.4],fatPct:[3,8],umami:4},
+  {id:"noodle_pasta",name:"면/파스타",saltPct:[0.8,1.2],sweetPct:[0,3],acidPct:[0,1.2],fatPct:[5,15],umami:4},
   {id:"dressing",name:"드레싱/샐러드",saltPct:[0.6,1.2],sweetPct:[2,8],acidPct:[5,25],fatPct:[20,60],umami:2},
   {id:"dipping_sauce",name:"소스/디핑",saltPct:[1.5,3.5],sweetPct:[3,15],acidPct:[0,10],fatPct:[0,70],umami:5},
   {id:"kids_side",name:"아이 반찬",saltPct:[0.7,1.0],sweetPct:[2,5],acidPct:[0,0.5],fatPct:[3,7],umami:4}
@@ -449,10 +449,10 @@ const STYLES = [
   {id:"chili_crisp",name:"칠리크리스프/바삭매콤",desc:"매운맛보다 바삭한 기름향이 핵심. 튀긴 마늘·양파·깨를 더하면 완성도 ↑.",over:{saltPct:[1.0,1.3],sweetPct:[1,3],acidPct:[0,0.5],fatPct:[10,20],umami:4},rec:["chili_powder","oil","fried_garlic","fried_onion","soy_sauce","sesame"]},
   {id:"yuzu_lime_spicy",name:"유자라임 새콤매콤",desc:"산미와 단맛이 살아있는 상큼한 매콤함.",over:{saltPct:[0.9,1.2],sweetPct:[3,7],acidPct:[3,8],fatPct:[1,5],umami:3},rec:["soy_sauce","yuzu_syrup","lime_juice","vinegar","chili_sauce"]},
   {id:"gochujang_mayo",name:"고추장마요/김치마요",desc:"고소한 마요 중심의 매콤새콤.",over:{saltPct:[1.0,1.5],sweetPct:[2,6],acidPct:[1,5],fatPct:[35,70],umami:4},rec:["mayo","gochujang","sugar","vinegar","soy_sauce"]},
-  {id:"baek_jongwon",name:"백종원식 대중 한식",desc:"단짠·마늘·파기름으로 밥이랑 잘 맞는 진한 한식.",over:{saltPct:[1.1,1.4],sweetPct:[2,6],acidPct:[0,1],fatPct:[4,8],umami:5},rec:["soy_sauce","sugar","garlic","green_onion","oil","sesame_oil"]},
-  {id:"ryu_sooyoung",name:"류수영식 원팬 집밥",desc:"진하고 눅진한 원팬 밥반찬 스타일.",over:{saltPct:[1.0,1.3],sweetPct:[2,5],acidPct:[0,1],fatPct:[5,10],umami:5},rec:["soy_sauce","oyster_sauce","sugar","garlic","oil","gochujang"]},
+  {id:"baek_jongwon",name:"백종원식 대중 한식",desc:"단짠·마늘·파기름으로 밥이랑 잘 맞는 진한 한식.",over:{saltPct:[1.1,1.4],sweetPct:[2,6],acidPct:[0,0.5],fatPct:[4,8],umami:5},rec:["soy_sauce","sugar","garlic","green_onion","oil","sesame_oil"]},
+  {id:"ryu_sooyoung",name:"류수영식 원팬 집밥",desc:"진하고 눅진한 원팬 밥반찬 스타일.",over:{saltPct:[1.0,1.3],sweetPct:[2,5],acidPct:[0,0.5],fatPct:[5,10],umami:5},rec:["soy_sauce","oyster_sauce","sugar","garlic","oil","gochujang"]},
   {id:"lee_yeonbok",name:"이연복식 중식풍",desc:"파마늘생강 기름향, 굴소스, 전분 농도 중심.",over:{saltPct:[1.0,1.3],sweetPct:[1,4],acidPct:[0.5,3],fatPct:[8,15],umami:5},rec:["soy_sauce","oyster_sauce","sugar","vinegar","oil","starch_water","garlic","ginger"]},
-  {id:"choi_kangrok",name:"최강록식 섬세한 감칠맛",desc:"다시·간장·미림으로 조용하게 깊은 맛.",over:{saltPct:[0.8,1.1],sweetPct:[1,3],acidPct:[0,1],fatPct:[2,6],umami:5},rec:["soy_sauce","mirin","dashi","sugar"]},
+  {id:"choi_kangrok",name:"최강록식 섬세한 감칠맛",desc:"다시·간장·미림으로 조용하게 깊은 맛.",over:{saltPct:[0.8,1.1],sweetPct:[1,3],acidPct:[0,0.5],fatPct:[2,6],umami:5},rec:["soy_sauce","mirin","dashi","sugar"]},
   {id:"gordon_ramsay",name:"고든 램지식 서양식",desc:"정확한 소금 간, 버터·허브, 마지막 산미 마무리.",over:{saltPct:[0.9,1.2],sweetPct:[0,1],acidPct:[0.5,2],fatPct:[8,20],umami:3},rec:["salt","butter","olive_oil","lemon_juice","herbs","garlic","pepper"]},
   {id:"fine_dining",name:"파인다이닝풍",desc:"절제된 간·산미·향, 식감 포인트.",over:{saltPct:[0.8,1.1],sweetPct:[0,2],acidPct:[1,3],fatPct:[5,15],umami:4},rec:["salt","lemon_juice","olive_oil","herbs","butter"]}
 ];
@@ -490,6 +490,7 @@ const INTENSITY = {mild:0.85, normal:1.0, strong:1.15};
 function intMul(axis, mode){ const m = INTENSITY[mode]; if((axis==="acid"||axis==="spice")) return Math.min(m,1.1); return m; }
 
 const mid = r => (r[0]+r[1])/2;
+const acidPoint = r => r[0] + 0.25*(r[1]-r[0]); // 산미는 마무리 액센트 — 범위 하한쪽(소량)
 const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
 
 /* ════════════════════════════════════════════════════════════════════
@@ -518,7 +519,7 @@ function calcRecipe(state){
     const targets = {
       salt: w*mid(prof.saltPct)/100 * intMul("salt",mode) * (style.saltMultiplier||1),
       sweet:w*mid(prof.sweetPct)/100* intMul("sweet",mode)* (style.sweetMultiplier||1),
-      acid: w*mid(prof.acidPct)/100 * intMul("acid",mode) * (style.acidMultiplier||1),
+      acid: w*acidPoint(prof.acidPct)/100 * intMul("acid",mode) * (style.acidMultiplier||1),
       fat:  w*mid(prof.fatPct)/100  * intMul("fat",mode)  * (style.fatMultiplier||1)
     };
     const FIELD={salt:"saltEq",sweet:"sweetEq",acid:"acidEq",fat:"fatEq"};
@@ -671,7 +672,8 @@ function deliciousness(t,synergy=0){
   let saltBase; if(salt<3)saltBase=salt*8; else if(salt<=7)saltBase=24; else saltBase=24-(salt-7)*6;
   const sweetSalt=(salt>=3&&sweet>=2&&sweet<=6)?18:0;
   const umamiBonus=Math.min(umami,8)*3.2; const synergyBonus=Math.max(0,Math.min(1,synergy))*9;
-  let sourBalance; if(sour<=4)sourBalance=sour*3; else sourBalance=12-(sour-4)*4;
+  // [R4 보정] 산미는 '마무리 한 방울'이 정설 — 소량(≈2)에서만 살짝 둥글려주고, 그 이상은 빠르게 감점
+  let sourBalance; if(sour<=2)sourBalance=sour*2; else sourBalance=4-(sour-2)*2.5;
   const spicyPenalty=spicy>7?-(spicy-7)*6:0; const sweetMask=sweet>7?-(sweet-7)*5:0;
   const vals=[salt,sweet,sour,umami,spicy]; const mean=vals.reduce((a,b)=>a+b,0)/5;
   const sd=Math.sqrt(vals.reduce((a,b)=>a+(b-mean)**2,0)/5);
