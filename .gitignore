@@ -1,0 +1,15 @@
+# OS / 에디터
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# 의존성 / 빌드 (현재 MVP는 무빌드)
+node_modules/
+dist/
+build/
+
+# 로컬 임시
+_*/
+*.log
