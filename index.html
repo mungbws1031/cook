@@ -384,6 +384,21 @@
     <div class="recipes" id="recipeList"></div>
   </section>
 
+  <!-- ════════ 소스 배합소 ════════ -->
+  <section class="view" id="view-sauce">
+    <div class="hd">
+      <div class="kicker">Sauce Lab · 유명한 그 맛</div>
+      <div class="row">
+        <div class="avatar" style="background:linear-gradient(135deg,#E0584E,#7a2a24)">🥫</div>
+        <div><div class="name">소스 배합소</div><div class="sub">유명한 소스를 골라 조절좌로 내 입맛에</div></div>
+      </div>
+    </div>
+    <div class="sec"><div class="lab">유명한 맛 고르기</div><div class="chips" id="sauceChips"></div></div>
+    <div class="presetdesc" id="sauceDesc" style="margin:8px 18px 0"></div>
+    <div class="sliders"><div class="lab">조절좌 — 맵기·단맛 등을 입맛대로</div><div id="sauceSliders"></div></div>
+    <div class="result" id="sauceRecipe"></div>
+  </section>
+
   <!-- ════════ 저장 ════════ -->
   <section class="view" id="view-saved">
     <div class="hd">
@@ -401,6 +416,7 @@
     <button data-view="explore" class="on"><span class="ic">🎚️</span><span class="tx">탐색</span></button>
     <button data-view="calc"><span class="ic">🧮</span><span class="tx">계산</span></button>
     <button data-view="recipe"><span class="ic">🍙</span><span class="tx">요리</span></button>
+    <button data-view="sauce"><span class="ic">🥫</span><span class="tx">소스</span></button>
     <button data-view="fix"><span class="ic">🩹</span><span class="tx">보정</span></button>
     <button data-view="saved"><span class="ic">★</span><span class="tx">저장</span></button>
   </nav>
@@ -955,6 +971,55 @@ const RECIPES=[
     </div>`).join("");
   el.querySelectorAll(".rc").forEach(c=>{ c.querySelector(".rch").onclick=()=>c.classList.toggle("open"); });
 })();
+
+/* ── 소스 배합소 ── */
+const SAUCE_DENS={"간장":1.15,"설탕":0.85,"고추장":1.2,"고춧가루":0.5,"올리고당":1.35,"물엿":1.35,"꿀":1.4,"케첩":1.1,"마요네즈":0.95,"식초":1.0,"다진마늘":1.0,"버터":0.96,"우유/생크림":1.0,"다시다":0.65,"두반장":1.2,"마라소스":1.0,"청양고추":1.0,"후추":0.5,"화자오":0.5,"카레가루":0.5};
+const SAUCES=[
+  {emoji:"🍗",name:"허니콤보",desc:"바삭한 위에 달콤짭짤 간장+꿀. 안 매운 단짠의 정석.",base:{salt:6,sweet:8,sour:1,umami:5,spicy:1},
+   ing:[{n:"간장",g:30,ax:"salt"},{n:"꿀",g:30,ax:"sweet"},{n:"올리고당",g:15,ax:"sweet"},{n:"다진마늘",g:10,ax:"umami"},{n:"버터",g:10,ax:null},{n:"후추",g:1,ax:null}]},
+  {emoji:"🔥",name:"불닭볶음",desc:"혀가 얼얼한 극강 매움 위에 단짠. 캡사이신 폭탄.",base:{salt:6,sweet:6,sour:1,umami:6,spicy:10},
+   ing:[{n:"고추장",g:25,ax:"spicy"},{n:"고춧가루",g:15,ax:"spicy"},{n:"청양고추",g:15,ax:"spicy"},{n:"간장",g:15,ax:"salt"},{n:"설탕",g:20,ax:"sweet"},{n:"물엿",g:15,ax:"sweet"},{n:"다진마늘",g:10,ax:"umami"},{n:"다시다",g:3,ax:"umami"}]},
+  {emoji:"😈",name:"엽기떡볶이",desc:"매운데 자꾸 먹게 되는 중독 매콤 단짠 감칠.",base:{salt:6,sweet:6,sour:1,umami:7,spicy:9},
+   ing:[{n:"고추장",g:30,ax:"spicy"},{n:"고춧가루",g:15,ax:"spicy"},{n:"청양고추",g:20,ax:"spicy"},{n:"설탕",g:25,ax:"sweet"},{n:"간장",g:10,ax:"salt"},{n:"다시다",g:5,ax:"umami"},{n:"다진마늘",g:10,ax:"umami"},{n:"카레가루",g:2,ax:null}]},
+  {emoji:"🏫",name:"국민학교 떡볶이",desc:"덜 맵고 달달한 추억의 분식집 맛.",base:{salt:5,sweet:7,sour:1,umami:5,spicy:4},
+   ing:[{n:"고추장",g:20,ax:"spicy"},{n:"고춧가루",g:5,ax:"spicy"},{n:"설탕",g:20,ax:"sweet"},{n:"물엿",g:20,ax:"sweet"},{n:"간장",g:10,ax:"salt"},{n:"다진마늘",g:6,ax:"umami"}]},
+  {emoji:"🍗",name:"양념치킨",desc:"새콤달콤 매콤, 치킨집 빨간 양념.",base:{salt:6,sweet:7,sour:3,umami:5,spicy:5},
+   ing:[{n:"고추장",g:25,ax:"spicy"},{n:"케첩",g:25,ax:"sweet"},{n:"물엿",g:20,ax:"sweet"},{n:"간장",g:10,ax:"salt"},{n:"다진마늘",g:10,ax:"umami"},{n:"식초",g:5,ax:"sour"}]},
+  {emoji:"🌸",name:"로제",desc:"우유·크림에 매콤달콤. 요즘 그 분홍 소스.",base:{salt:6,sweet:5,sour:1,umami:6,spicy:4},
+   ing:[{n:"우유/생크림",g:100,ax:null},{n:"고추장",g:15,ax:"spicy"},{n:"케첩",g:15,ax:"sweet"},{n:"버터",g:15,ax:null},{n:"설탕",g:10,ax:"sweet"},{n:"간장",g:5,ax:"salt"},{n:"다진마늘",g:8,ax:"umami"}]},
+  {emoji:"🌶️",name:"마라(마라장)",desc:"화자오의 얼얼함(마)+매움(라). 중독성 끝판.",base:{salt:6,sweet:3,sour:1,umami:7,spicy:9},
+   ing:[{n:"마라소스",g:30,ax:"spicy"},{n:"두반장",g:15,ax:"umami"},{n:"고춧가루",g:10,ax:"spicy"},{n:"간장",g:10,ax:"salt"},{n:"설탕",g:8,ax:"sweet"},{n:"다진마늘",g:10,ax:"umami"},{n:"화자오",g:2,ax:null}]},
+  {emoji:"🥢",name:"간장치킨",desc:"마늘 향 단짠 간장. 안 매운 사람용 인기.",base:{salt:7,sweet:6,sour:1,umami:5,spicy:2},
+   ing:[{n:"간장",g:35,ax:"salt"},{n:"물엿",g:25,ax:"sweet"},{n:"설탕",g:10,ax:"sweet"},{n:"다진마늘",g:12,ax:"umami"},{n:"청양고추",g:8,ax:"spicy"},{n:"후추",g:1,ax:null}]}
+];
+const sauceColor=k=>{ const x=TASTES.find(t=>t.key===k); return x?x.color:"#9C9484"; };
+let sauceState={...SAUCES[0].base}, currentSauce=null;
+const sauceChips=$("sauceChips");
+SAUCES.forEach(s=>{ const el=document.createElement("button"); el.className="chip"; el.textContent=s.emoji+" "+s.name;
+  el.onclick=()=>selectSauce(s); sauceChips.appendChild(el); });
+const sauceSlidersEl=$("sauceSliders"), sauceInputs={}, sauceVals={};
+TASTES.forEach(x=>{ const wrap=document.createElement("div"); wrap.className="sl";
+  wrap.innerHTML=`<div class="top"><span class="left"><span class="dot" style="background:${x.color};box-shadow:0 0 8px ${x.color}"></span><span class="nm">${x.label}</span></span><span class="val" style="color:${x.color}" id="sv-${x.key}">0</span></div>`;
+  const inp=document.createElement("input"); inp.type="range"; inp.min=0; inp.max=10; inp.step=0.5; inp.value=0; inp.style.accentColor=x.color;
+  inp.setAttribute("role","slider"); inp.setAttribute("aria-label",x.label);
+  inp.addEventListener("input",e=>{ const v=parseFloat(e.target.value); sauceState={...sauceState,[x.key]:v}; sauceVals[x.key].textContent=v.toFixed(1); renderSauceRecipe(); });
+  wrap.appendChild(inp); sauceSlidersEl.appendChild(wrap); sauceInputs[x.key]=inp; sauceVals[x.key]=$(`sv-${x.key}`); });
+function selectSauce(s){ currentSauce=s; sauceState={...s.base};
+  TASTES.forEach(x=>{ sauceInputs[x.key].value=s.base[x.key]; sauceVals[x.key].textContent=s.base[x.key].toFixed(1); });
+  [...sauceChips.children].forEach(c=>c.classList.toggle("on", c.textContent===s.emoji+" "+s.name));
+  $("sauceDesc").textContent=s.desc; renderSauceRecipe();
+}
+function renderSauceRecipe(){ const s=currentSauce; if(!s) return;
+  const rows=s.ing.map(it=>{
+    let g=(it.ax && s.base[it.ax]>0) ? it.g*(sauceState[it.ax]/s.base[it.ax]) : it.g; g=Math.max(0,g);
+    const dim=g<0.5; const spoon=dim?"":spoonStr(g, SAUCE_DENS[it.n]||1.1);
+    return `<div class="ing${dim?' sub':''}"><div class="l"><span class="cdot" style="background:${it.ax?sauceColor(it.ax):'#9C9484'}"></span><div><div class="nm">${it.n}</div></div></div>
+      <div class="r">${dim?'<div class="sp">빼기</div>':`<div class="g">${fmtG(g)}<small>g</small></div><div class="sp">🥄 ${spoon}</div>`}</div></div>`;
+  }).join("");
+  $("sauceRecipe").innerHTML=`<div class="rcard hero"><h3>🥫 ${s.name} 소스 <span class="heronote">— 2인분 기준</span></h3>${rows}</div>
+    <div class="rcard"><div class="rsummary">위 조절좌(맵기·단맛 등)를 움직이면 재료 양이 <b>실시간</b>으로 바뀌어요. 맵기 0으로 내리면 매운 재료는 '빼기'!</div></div>`;
+}
+selectSauce(SAUCES[0]);
 
 /* ── 탐색 (시뮬레이터) ── */
 let t={salt:6,sweet:4,sour:2,umami:7,spicy:1}, synergy=0, isGold=false, displayVec={...t};
