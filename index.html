@@ -9,12 +9,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Noto+Sans+KR:wght@400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
 <style>
   :root{
-    --bg-base:#0F1411; --bg-frame:#161D19; --surface:#1B2420; --surface2:#202B26; --border:#2A332E;
-    --text:#F0EDE6; --muted:#8A938C; --faint:#6F7972;
-    --gold:#FFD23F; --chef-brown:#C77B3C; --accent:#FF8A4C; --accent-soft:rgba(255,138,76,.14);
-    --t-salt:#5B8DEF; --t-sweet:#F2A0C4; --t-sour:#E8C547; --t-umami:#C77B3C; --t-fat:#E0B15A; --t-spicy:#E60044;
-    --g-gold:#FFD23F; --g-good:#9CCB6A; --g-mid:#E8C547; --g-low:#C96A5E;
-    --warn:#E0A23C; --danger:#E0584E;
+    --bg-base:#F4EEE3; --bg-frame:#FFFCF6; --surface:#FBF5EC; --surface2:#F1E9DB; --border:#E6DCCB;
+    --text:#2B2620; --muted:#7C7060; --faint:#A39684;
+    --gold:#D99A00; --chef-brown:#B06A22; --accent:#F2722B; --accent-soft:rgba(242,114,43,.12);
+    --t-salt:#3F6FD8; --t-sweet:#D96BA0; --t-sour:#C2941A; --t-umami:#B06A22; --t-fat:#BE8E2C; --t-spicy:#D6002F;
+    --g-gold:#D99A00; --g-good:#5FA236; --g-mid:#C2941A; --g-low:#C85B49;
+    --warn:#C98A1E; --danger:#D6483C; --track:#ECE3D4; --shadow:rgba(90,70,35,.18);
     --display:'Fraunces',serif; --body:'Noto Sans KR',sans-serif; --mono:'Space Mono',monospace;
     --navh:64px;
   }
@@ -32,12 +32,12 @@
   }
   @media (min-width:480px){
     body{display:flex;justify-content:center;align-items:flex-start;padding:20px 12px}
-    .frame{max-width:400px;min-height:0;border-radius:28px;border:1px solid #232C27;
-      box-shadow:0 24px 60px -24px rgba(0,0,0,.8);position:relative}
+    .frame{max-width:400px;min-height:0;border-radius:28px;border:1px solid var(--border);
+      box-shadow:0 24px 60px -24px var(--shadow);position:relative}
   }
 
   /* 공용 헤더 */
-  .hd{padding:calc(env(safe-area-inset-top) + 18px) 20px 14px;border-bottom:1px solid #232C27;position:relative}
+  .hd{padding:calc(env(safe-area-inset-top) + 18px) 20px 14px;border-bottom:1px solid var(--border);position:relative}
   .hd .kicker{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--faint);text-transform:uppercase}
   .hd .row{display:flex;align-items:center;gap:11px;margin-top:9px}
   .avatar{width:38px;height:38px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,#C77B3C,#7A4A22);
@@ -74,7 +74,7 @@
     border-radius:11px;padding:11px 4px;cursor:pointer;min-height:44px;transition:.15s}
   .seg button.on{color:#1a130c;background:var(--accent);border-color:var(--accent)}
 
-  .presetdesc{font-size:12px;line-height:1.5;color:#B9C0BA;background:var(--accent-soft);border:1px solid rgba(255,138,76,.25);
+  .presetdesc{font-size:12px;line-height:1.5;color:#5A5345;background:var(--accent-soft);border:1px solid rgba(255,138,76,.25);
     border-radius:12px;padding:10px 12px;margin-top:10px}
 
   .gobtn{display:block;width:calc(100% - 36px);margin:16px 18px 6px;padding:15px;border:none;border-radius:15px;cursor:pointer;
@@ -90,11 +90,11 @@
   .rsummary{font-size:12.5px;color:var(--muted);line-height:1.5}
   .rsummary b{color:var(--text)}
 
-  .ing{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px dashed #283029}
+  .ing{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px dashed var(--border)}
   .ing:last-child{border-bottom:none}
   .ing .l .nm{font-size:14.5px;font-weight:700}
   .ing .l .tm{font-size:10.5px;color:var(--faint);font-family:var(--mono);margin-top:2px}
-  .ing .l .tm.early{color:#8FB3E0}.ing .l .tm.middle{color:var(--chef-brown)}.ing .l .tm.finish{color:#C7A0D0}
+  .ing .l .tm.early{color:#3F6FD8}.ing .l .tm.middle{color:var(--chef-brown)}.ing .l .tm.finish{color:#9C5BB0}
   .ing .r{text-align:right;white-space:nowrap}
   .ing .r .g{font-family:var(--mono);font-size:26px;font-weight:700;color:var(--accent)}
   .ing .r .sp{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:1px}
@@ -102,17 +102,17 @@
   .bars{display:flex;flex-direction:column;gap:7px}
   .bar{display:flex;align-items:center;gap:9px}
   .bar .bn{width:44px;font-size:11.5px;color:var(--muted);flex-shrink:0}
-  .bar .bt{flex:1;height:8px;background:#222B26;border-radius:99px;overflow:hidden}
+  .bar .bt{flex:1;height:8px;background:var(--track);border-radius:99px;overflow:hidden}
   .bar .bt i{display:block;height:100%;border-radius:99px}
   .bar .bv{width:16px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--faint)}
 
   ol.steps{margin:2px 0 0;padding-left:18px}
-  ol.steps li{font-size:12.5px;line-height:1.6;color:#B9C0BA;margin-bottom:5px}
+  ol.steps li{font-size:12.5px;line-height:1.6;color:#5A5345;margin-bottom:5px}
 
   .warns{display:flex;flex-direction:column;gap:7px}
-  .warn{display:flex;gap:8px;font-size:12px;line-height:1.45;color:#E7D9B8;background:rgba(224,162,60,.1);
+  .warn{display:flex;gap:8px;font-size:12px;line-height:1.45;color:#6B5A2E;background:rgba(224,162,60,.1);
     border:1px solid rgba(224,162,60,.3);border-radius:11px;padding:9px 11px}
-  .warn.stop{color:#F2C3BD;background:rgba(224,88,78,.12);border-color:rgba(224,88,78,.35)}
+  .warn.stop{color:#B23B2E;background:rgba(224,88,78,.12);border-color:rgba(224,88,78,.35)}
   .warn .i{flex-shrink:0}
 
   .saverow{display:flex;gap:8px;margin:2px 0 4px}
@@ -123,7 +123,7 @@
   .rcard.hero{border-color:rgba(255,138,76,.45);background:linear-gradient(180deg,rgba(255,138,76,.09),var(--surface))}
   .rcard.hero h3{font-size:17px}
   .heronote{font-family:var(--body);font-size:11px;font-weight:700;color:var(--accent)}
-  .blendbar{display:flex;height:15px;border-radius:99px;overflow:hidden;margin:9px 0 4px;background:#222B26}
+  .blendbar{display:flex;height:15px;border-radius:99px;overflow:hidden;margin:9px 0 4px;background:var(--track)}
   .blendbar span{display:block;height:100%}
   .cdot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-right:10px}
   .ing .l{display:flex;align-items:center}
@@ -137,26 +137,26 @@
   .znum{font-family:var(--mono);font-size:34px;font-weight:700;line-height:1}
   .zden{font-family:var(--mono);font-size:12px;color:var(--faint)}
   .zbadge{margin-left:auto;font-size:11px;font-weight:700;color:#1a130c;background:var(--gold);border-radius:99px;padding:4px 10px;align-self:center;animation:goldpulse 2s ease-in-out infinite}
-  .ztrack{position:relative;height:16px;background:#222B26;border-radius:99px;overflow:hidden}
+  .ztrack{position:relative;height:16px;background:var(--track);border-radius:99px;overflow:hidden}
   .zzone{position:absolute;top:0;bottom:0;left:78%;right:0;background:repeating-linear-gradient(45deg,rgba(255,210,63,.30),rgba(255,210,63,.30) 5px,rgba(255,210,63,.15) 5px,rgba(255,210,63,.15) 10px)}
   .zfill{position:absolute;top:0;bottom:0;left:0;border-radius:99px;transition:width .45s ease}
   .zmark{position:absolute;top:-3px;bottom:-3px;width:3px;background:var(--text);border-radius:2px;transform:translateX(-1px);box-shadow:0 0 0 2px var(--surface);transition:left .45s ease}
   .zticks{position:relative;height:13px;margin-top:5px;font-family:var(--mono);font-size:9px;color:var(--faint)}
   .zticks span{position:absolute}.zticks span.z0{left:0}.zticks span.z100{right:0}
   .zticks .zz{left:78%;transform:translateX(-50%);color:var(--gold)}
-  .zmsg{font-size:12px;line-height:1.5;color:#B9C0BA;margin-top:9px}
+  .zmsg{font-size:12px;line-height:1.5;color:#5A5345;margin-top:9px}
   .zon.gold .zmsg{color:var(--gold)}
 
   /* 보정 */
   .fixcard{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px 15px;margin:4px 16px 12px}
   .fixcard .ft{font-family:var(--display);font-size:16px;font-weight:600;color:var(--accent);margin-bottom:8px}
-  .fixstep{display:flex;gap:9px;padding:9px 0;border-bottom:1px dashed #283029}
+  .fixstep{display:flex;gap:9px;padding:9px 0;border-bottom:1px dashed var(--border)}
   .fixstep:last-child{border-bottom:none}
   .fixstep .tag{flex-shrink:0;font-family:var(--mono);font-size:10px;font-weight:700;color:#1a130c;background:var(--gold);border-radius:6px;padding:3px 6px;height:fit-content}
   .fixstep .tag.s2{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
   .fixstep .tx{font-size:13px;line-height:1.5}
   .fixstep .tx b{color:var(--accent)}
-  .fixdesc{font-size:12.5px;line-height:1.6;color:#B9C0BA;margin-top:10px;background:var(--accent-soft);border-radius:11px;padding:10px 12px}
+  .fixdesc{font-size:12.5px;line-height:1.6;color:#5A5345;margin-top:10px;background:var(--accent-soft);border-radius:11px;padding:10px 12px}
 
   /* 저장 */
   .saved{padding:6px 16px}
@@ -167,11 +167,11 @@
   .srow .sm{font-size:11.5px;color:var(--muted);margin-top:3px}
   .srow .stars{font-size:14px;letter-spacing:1px;margin-top:6px;cursor:pointer;color:var(--faint)}
   .srow .stars .on{color:var(--gold)}
-  .srow .sing{margin-top:8px;font-size:12px;color:#B9C0BA;line-height:1.7;display:none}
+  .srow .sing{margin-top:8px;font-size:12px;color:#5A5345;line-height:1.7;display:none}
   .srow.open .sing{display:block}
   .srow .act{display:flex;gap:8px;margin-top:9px}
   .srow .act button{font-size:11.5px;color:var(--muted);background:transparent;border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer}
-  .srow .act button.del{color:#D98A82;border-color:rgba(217,138,130,.4)}
+  .srow .act button.del{color:#C0483C;border-color:rgba(217,138,130,.4)}
   .empty{text-align:center;color:var(--faint);font-size:13px;padding:50px 20px;line-height:1.7}
 
   /* ── 탐색(시뮬레이터) ── */
@@ -185,12 +185,12 @@
   .score .num{font-family:var(--mono);font-size:42px;font-weight:700;line-height:1}
   .score .den{font-family:var(--mono);font-size:14px;color:var(--faint)}
   .score .tag{font-size:11px;letter-spacing:1px;color:var(--muted);margin-top:2px}
-  .gaugebar{height:6px;background:#222B26;border-radius:99px;margin:0 14px 12px;overflow:hidden}
+  .gaugebar{height:6px;background:var(--track);border-radius:99px;margin:0 14px 12px;overflow:hidden}
   .gaugebar>i{display:block;height:100%;border-radius:99px;transition:width .3s,background .3s}
   .card{margin:0 16px 14px;padding:13px 15px;border-radius:14px;background:var(--surface);border:1px solid var(--border)}
   .chef.goldc{background:rgba(255,210,63,.09);border-color:rgba(255,210,63,.4)}
   .chef .title{font-family:var(--display);font-size:16px;font-weight:600;margin-bottom:4px}
-  .chef .body{font-size:13px;line-height:1.6;color:#B9C0BA}
+  .chef .body{font-size:13px;line-height:1.6;color:#5A5345}
   .preset-row{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:0 16px 4px}
   .preset-row button{font-weight:700;font-size:12px;color:var(--text);background:var(--surface);border:1px solid var(--border);
     border-radius:11px;min-height:44px;padding:9px 4px;cursor:pointer}
@@ -200,9 +200,9 @@
   .sl .left{display:flex;align-items:center;gap:7px}.sl .dot{width:9px;height:9px;border-radius:50%}
   .sl .nm{font-weight:700;font-size:14px}.sl .sci{font-family:var(--mono);font-size:9px;color:var(--faint)}
   .sl .val{font-family:var(--mono);font-size:13px;font-weight:700;min-width:26px;text-align:right}
-  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;background:#2A332E;border-radius:99px;cursor:pointer;touch-action:none}
-  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--text);box-shadow:0 1px 5px rgba(0,0,0,.6)}
-  input[type=range]::-moz-range-thumb{width:26px;height:26px;border:none;border-radius:50%;background:var(--text);box-shadow:0 1px 5px rgba(0,0,0,.6)}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;background:var(--track);border-radius:99px;cursor:pointer;touch-action:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--text);box-shadow:0 1px 5px rgba(90,70,35,.3)}
+  input[type=range]::-moz-range-thumb{width:26px;height:26px;border:none;border-radius:50%;background:var(--text);box-shadow:0 1px 5px rgba(90,70,35,.3)}
   .syn{margin:2px 16px 8px;padding:11px 14px;border-radius:14px;background:var(--surface);border:1px solid var(--border)}
   .syn .top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px}
   .syn .nm{font-weight:700;font-size:13px}.syn .val{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--chef-brown)}
@@ -214,14 +214,27 @@
   .combo .cr{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--chef-brown);white-space:nowrap;margin-left:10px}
 
   /* 하단 네비 */
-  .nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:rgba(18,24,20,.94);backdrop-filter:blur(10px);
-    border-top:1px solid #232C27;padding-bottom:env(safe-area-inset-bottom);z-index:20}
+  .nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:rgba(255,252,246,.92);backdrop-filter:blur(10px);
+    border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom);z-index:20}
   @media (min-width:480px){.nav{position:absolute;border-radius:0 0 28px 28px}}
   .nav button{flex:1;background:none;border:none;color:var(--faint);padding:9px 2px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;height:var(--navh)}
   .nav button .ic{font-size:19px;line-height:1}
   .nav button .tx{font-size:10px;font-weight:700}
   .nav button.on{color:var(--accent)}
   .nav button.on .ic{transform:translateY(-1px)}
+
+  /* 맛 스타일 말풍선(토스트) */
+  .bubble{position:fixed;left:50%;bottom:calc(var(--navh) + env(safe-area-inset-bottom) + 16px);
+    transform:translateX(-50%) translateY(8px);background:var(--accent);color:#fff;border-radius:16px;
+    padding:10px 15px;max-width:84%;box-shadow:0 12px 26px -8px var(--shadow);
+    opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:40;text-align:center}
+  .bubble.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;cursor:pointer}
+  .bubble.gold{background:var(--gold);color:#2B2620}
+  .bubble::after{content:"";position:absolute;left:50%;bottom:-7px;transform:translateX(-50%);
+    border-left:8px solid transparent;border-right:8px solid transparent;border-top:8px solid var(--accent)}
+  .bubble.gold::after{border-top-color:var(--gold)}
+  .bubble .bbl-t{font-size:13.5px;font-weight:700}
+  .bubble .bbl-s{font-size:11px;opacity:.92;margin-top:2px}
 </style>
 </head>
 <body>
@@ -358,6 +371,7 @@
     <button data-view="explore"><span class="ic">🎚️</span><span class="tx">탐색</span></button>
     <button data-view="saved"><span class="ic">★</span><span class="tx">저장</span></button>
   </nav>
+  <div class="bubble" id="styleBubble"></div>
 </div>
 
 <script>
@@ -735,7 +749,7 @@ $("intensitySeg").addEventListener("click", e=>{ const b=e.target.closest("butto
 let lastResult=null;
 $("calcBtn").onclick=()=>{
   const w=parseFloat($("weight").value);
-  if(!w || w<1){ $("calcResult").innerHTML=`<div class="rcard" style="border-color:rgba(224,88,78,.4)"><div class="rsummary" style="color:#F2C3BD">음식 무게를 1g 이상 입력해야 계산할 수 있어요.</div></div>`; return; }
+  if(!w || w<1){ $("calcResult").innerHTML=`<div class="rcard" style="border-color:rgba(224,88,78,.4)"><div class="rsummary" style="color:#B23B2E">음식 무게를 1g 이상 입력해야 계산할 수 있어요.</div></div>`; return; }
   calcState.foodWeightG=w;
   lastResult=calcRecipe(calcState);
   renderCalcResult(lastResult);
@@ -848,13 +862,13 @@ EXPLORE_PRESETS.forEach(p=>{ const b=document.createElement("button"); b.textCon
 const RADAR={cx:160,cy:108,R:80};
 function axisPoint(i,value){const ang=-Math.PI/2+i*(2*Math.PI/5);const r=RADAR.R*(value/10);return[RADAR.cx+r*Math.cos(ang),RADAR.cy+r*Math.sin(ang)];}
 (function buildRadar(){const svg=$("radar");let g="";
-  [0.25,0.5,0.75,1].forEach(f=>{const pts=TASTES.map((_,i)=>axisPoint(i,10*f).join(",")).join(" ");g+=`<polygon points="${pts}" fill="none" stroke="#2C352F" stroke-width="1"/>`;});
-  TASTES.forEach((_,i)=>{const[x,y]=axisPoint(i,10);g+=`<line x1="${RADAR.cx}" y1="${RADAR.cy}" x2="${x}" y2="${y}" stroke="#2C352F" stroke-width="1"/>`;});
-  g+=`<polygon points="${TASTES.map((_,i)=>axisPoint(i,10).join(",")).join(" ")}" fill="#1E2722" fill-opacity="0.5" stroke="none"/>`;
+  [0.25,0.5,0.75,1].forEach(f=>{const pts=TASTES.map((_,i)=>axisPoint(i,10*f).join(",")).join(" ");g+=`<polygon points="${pts}" fill="none" stroke="#E0D6C4" stroke-width="1"/>`;});
+  TASTES.forEach((_,i)=>{const[x,y]=axisPoint(i,10);g+=`<line x1="${RADAR.cx}" y1="${RADAR.cy}" x2="${x}" y2="${y}" stroke="#E0D6C4" stroke-width="1"/>`;});
+  g+=`<polygon points="${TASTES.map((_,i)=>axisPoint(i,10).join(",")).join(" ")}" fill="#F0E8D9" fill-opacity="0.5" stroke="none"/>`;
   g+=`<polygon id="r-val" points="" stroke="#C77B3C" stroke-width="2" fill="#C77B3C" fill-opacity="0.28"/>`;
   TASTES.forEach((x,i)=>{const[lx,ly]=axisPoint(i,11.9);const anchor=Math.abs(lx-RADAR.cx)<6?"middle":(lx<RADAR.cx?"end":"start");
     g+=`<circle cx="${lx+(anchor==="end"?-6:anchor==="start"?6:0)}" cy="${ly-4}" r="3.2" fill="${x.color}"/>`;
-    g+=`<text class="axis-label" x="${lx}" y="${ly}" fill="#B9C0BA" text-anchor="${anchor}" dy="${i===0?-6:4}">${x.label}</text>`;});
+    g+=`<text class="axis-label" x="${lx}" y="${ly}" fill="#5A5345" text-anchor="${anchor}" dy="${i===0?-6:4}">${x.label}</text>`;});
   svg.innerHTML=g;})();
 function drawRadarValue(vec,gold){const pts=TASTES.map((x,i)=>axisPoint(i,vec[x.key]).join(",")).join(" ");const poly=$("r-val");
   poly.setAttribute("points",pts);poly.setAttribute("stroke",gold?"#FFD23F":"#C77B3C");poly.setAttribute("fill",gold?"#FFD23F":"#C77B3C");poly.setAttribute("fill-opacity",gold?"0.4":"0.28");}
@@ -872,6 +886,40 @@ function animateTo(vector){ if(reduceMotion){t={...t,...vector};syncSliders();re
   requestAnimationFrame(step);}
 function syncSliders(){TASTES.forEach(x=>{sliderInputs[x.key].value=t[x.key];});}
 function gaugeColor(s){return s>=78?"var(--g-gold)":s>=55?"var(--g-good)":s>=30?"var(--g-mid)":"var(--g-low)";}
+
+/* 탐색 슬라이더 → 계산 페이지의 '맛 스타일' 매칭 (대표 5축 벡터) */
+const STYLE_VECTORS={
+  basic_home:{salt:6,sweet:4,sour:1,umami:6,spicy:1}, kids_sweet_savory:{salt:5,sweet:6,sour:0,umami:5,spicy:0},
+  trendy_rose:{salt:6,sweet:6,sour:1,umami:6,spicy:5}, hot_honey_chicken:{salt:6,sweet:8,sour:3,umami:5,spicy:6},
+  chili_crisp:{salt:6,sweet:2,sour:0,umami:5,spicy:8}, yuzu_lime_spicy:{salt:5,sweet:6,sour:7,umami:4,spicy:5},
+  gochujang_mayo:{salt:6,sweet:4,sour:4,umami:5,spicy:5}, baek_jongwon:{salt:7,sweet:5,sour:1,umami:7,spicy:2},
+  ryu_sooyoung:{salt:6,sweet:4,sour:1,umami:8,spicy:2}, lee_yeonbok:{salt:6,sweet:3,sour:2,umami:8,spicy:1},
+  choi_kangrok:{salt:5,sweet:3,sour:1,umami:8,spicy:0}, gordon_ramsay:{salt:6,sweet:1,sour:3,umami:4,spicy:1},
+  fine_dining:{salt:5,sweet:2,sour:4,umami:5,spicy:1}
+};
+function nearestStyle(tv){ let best=null,bd=1e9;
+  for(const st of STYLES){ const v=STYLE_VECTORS[st.id]; if(!v)continue;
+    const d=Math.sqrt(["salt","sweet","sour","umami","spicy"].reduce((a,k)=>a+(tv[k]-v[k])**2,0));
+    if(d<bd){bd=d;best=st;} }
+  return best?{style:best,dist:bd}:null;
+}
+function goCalcWithStyle(id){
+  calcState.stylePresetId=id;
+  [...styleChips.children].forEach((el,i)=>el.classList.toggle("on", STYLES[i].id===id));
+  showStyleDesc();
+  document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("on", x.dataset.view==="calc"));
+  document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));
+  $("view-calc").classList.add("active");
+  window.scrollTo(0,0);
+}
+let _bubbleTO=null, _lastMatchId=null;
+function showBubble(style, gold){ const b=$("styleBubble"); if(!b)return;
+  b.className="bubble show"+(gold?" gold":"");
+  b.innerHTML=`<div class="bbl-t">${gold?"★ 존맛존 · ":""}이 맛 ≈ ${style.name}</div><div class="bbl-s">탭하면 이 맛으로 계산하기 →</div>`;
+  b.onclick=()=>{ goCalcWithStyle(style.id); hideBubble(); };
+  clearTimeout(_bubbleTO); _bubbleTO=setTimeout(hideBubble, 2800);
+}
+function hideBubble(){ const b=$("styleBubble"); if(b)b.classList.remove("show"); }
 function renderExplore(){
   const score=deliciousness(t,synergy);
   if(!isGold&&score>=GOLD_ENTER)isGold=true; else if(isGold&&score<GOLD_EXIT)isGold=false;
@@ -886,6 +934,12 @@ function renderExplore(){
   $("dish").textContent=matchDish(t);
   const combos=nearestCombos(t,PRODUCT_COMBOS,2);
   $("combos").innerHTML=combos.map((c,i)=>`<div class="combo ${i===0?'first':''}"><div><div class="cn">${c.name}</div><div class="cd">${c.dish}</div></div><div class="cr">${c.ratio}</div></div>`).join("");
+  // 조건 만족 시(가까운 맛 스타일) 말풍선 잠깐 표시
+  if($("view-explore").classList.contains("active")){
+    const ns=nearestStyle(t);
+    if(ns && ns.dist<=3.0){ if(ns.style.id!==_lastMatchId){ _lastMatchId=ns.style.id; showBubble(ns.style, isGold); } }
+    else _lastMatchId=null;
+  }
   morphRadar();
 }
 renderExplore(); drawRadarValue(displayVec,isGold);
