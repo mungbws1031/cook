@@ -775,7 +775,7 @@ function renderCalcResult(r){
     const tlabel={early:"향내기·먼저",middle:"간하기·중간",finish:"마무리"}[it.timing]||"";
     const sub=(it.id==="water"||it.id==="starch_water")?" sub":"";
     return `<div class="ing${sub}"><div class="l"><span class="cdot" style="background:${condColor(it.id)}"></span><div><div class="nm">${it.name}</div><div class="tm ${it.timing}">${tlabel}</div></div></div>
-      <div class="r"><div class="g">${fmtG(it.amountG)}<small>g</small></div><div class="sp">≈ ${spoonStr(it.amountG,it.density)}</div></div></div>`;
+      <div class="r"><div class="g">${fmtG(it.amountG)}<small>g</small></div><div class="sp">(${spoonStr(it.amountG,it.density)})</div></div></div>`;
   }).join("");
 
   // 존맛 지수 그래프
