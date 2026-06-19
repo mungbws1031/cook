@@ -235,6 +235,26 @@
   .bubble.gold::after{border-top-color:var(--gold)}
   .bubble .bbl-t{font-size:13.5px;font-weight:700}
   .bubble .bbl-s{font-size:11px;opacity:.92;margin-top:2px}
+
+  /* 쉬운 요리(레시피) */
+  .recipes{padding:8px 16px 4px}
+  .rc{background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden}
+  .rc .rch{display:flex;align-items:center;gap:11px;padding:13px 14px;cursor:pointer}
+  .rc .rem{font-size:24px;line-height:1}
+  .rc .rnm{font-family:var(--display);font-size:16px;font-weight:600;flex:1}
+  .rc .rmeta{font-family:var(--mono);font-size:10px;color:var(--faint);text-align:right;white-space:nowrap;line-height:1.5}
+  .rc .rmeta .rd{color:var(--gold)}
+  .rc .rchev{color:var(--faint);transition:transform .2s;flex-shrink:0}
+  .rc.open .rchev{transform:rotate(180deg)}
+  .rc .rbody{display:none;padding:2px 14px 14px}
+  .rc.open .rbody{display:block}
+  .rc .rsec{margin-top:11px}
+  .rc .rsec h4{margin:0 0 7px;font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--faint);text-transform:uppercase}
+  .rc .rings{display:flex;flex-wrap:wrap;gap:6px}
+  .rc .rings span{font-size:12px;color:var(--text);background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:5px 9px}
+  .rc ol.rsteps{margin:0;padding-left:19px}
+  .rc ol.rsteps li{font-size:13px;line-height:1.65;color:#5A5345;margin-bottom:6px}
+  .rc .rtip{font-size:12px;line-height:1.55;color:#6B5A2E;background:rgba(224,162,60,.12);border:1px solid rgba(224,162,60,.28);border-radius:10px;padding:9px 11px;margin-top:11px}
 </style>
 </head>
 <body>
@@ -352,6 +372,18 @@
     <div class="combos"><div class="lab">이 맛 내려면 — 기성품 조합</div><div id="combos"></div></div>
   </section>
 
+  <!-- ════════ 쉬운 요리 ════════ -->
+  <section class="view" id="view-recipe">
+    <div class="hd">
+      <div class="kicker">Easy Recipes · 요똥도 성공</div>
+      <div class="row">
+        <div class="avatar" style="background:linear-gradient(135deg,#5FA236,#2f6a1c)">🍙</div>
+        <div><div class="name">쉬운 요리</div><div class="sub">계량·머리 안 써도 되는 초간단 레시피</div></div>
+      </div>
+    </div>
+    <div class="recipes" id="recipeList"></div>
+  </section>
+
   <!-- ════════ 저장 ════════ -->
   <section class="view" id="view-saved">
     <div class="hd">
@@ -368,6 +400,7 @@
   <nav class="nav" id="nav">
     <button data-view="explore" class="on"><span class="ic">🎚️</span><span class="tx">탐색</span></button>
     <button data-view="calc"><span class="ic">🧮</span><span class="tx">계산</span></button>
+    <button data-view="recipe"><span class="ic">🍙</span><span class="tx">요리</span></button>
     <button data-view="fix"><span class="ic">🩹</span><span class="tx">보정</span></button>
     <button data-view="saved"><span class="ic">★</span><span class="tx">저장</span></button>
   </nav>
@@ -865,6 +898,52 @@ function renderSaved(){
     row.querySelector(".stars").onclick=e=>{ const s=e.target.closest("[data-r]"); if(!s)return; const arr2=loadSaved(); arr2[+row.dataset.i].rating=+s.dataset.r; writeSaved(arr2); renderSaved(); };
   });
 }
+
+/* ── 쉬운 요리(레시피) ── */
+const RECIPES=[
+  {emoji:"🍙",name:"김밥",diff:"★★☆",time:"25분",
+   ing:["밥 1.5공기","김밥김 2장","단무지 2줄","맛살 2개","계란 2개","당근·시금치 약간","참기름 1작은술","소금·통깨"],
+   steps:["따뜻한 밥에 참기름 1작은술·소금 약간·깨를 살살 섞어 한 김 식힌다.","계란은 도톰하게 부쳐 길게 썰고, 당근채는 소금 간해 볶고, 시금치는 데쳐 참기름·소금에 무친다.","김 위에 밥을 2/3만 얇게 펴고 속재료를 가지런히 올린다.","끝에서부터 단단히 말고, 칼에 참기름을 발라 한입 크기로 썬다."],
+   tip:"김 끝 1/4은 밥을 비워야 안 터져요. 밥은 뜨거울 때 간하고 식혀야 안 질척여요."},
+  {emoji:"🥪",name:"샌드위치",diff:"★☆☆",time:"10분",
+   ing:["식빵 2장","햄 2장","슬라이스치즈 1장","계란 1개","양상추 2장","마요네즈","머스터드(선택)"],
+   steps:["식빵 안쪽 면에 마요네즈(+머스터드)를 얇게 바른다.","계란프라이를 반숙~완숙으로 부친다.","빵 → 양상추 → 치즈 → 햄 → 계란 순으로 쌓고 빵을 덮는다.","살짝 눌러 대각선으로 자른다."],
+   tip:"양상추 물기를 키친타월로 닦으세요. 빵에 마요를 바르면 방수막이 돼서 안 눅눅해요."},
+  {emoji:"🍲",name:"미소장국",diff:"★☆☆",time:"10분",
+   ing:["물 2컵(400ml)","미소된장 1큰술","두부 1/4모","건미역 약간","대파","다시팩(선택)"],
+   steps:["물을 끓인다. 다시팩이 있으면 넣고 5분 우린 뒤 건진다.","미역·두부를 넣고 끓인다.","불을 줄이고 미소된장을 국자에 풀어 넣는다.","대파를 넣고 한소끔만 데우면 완성."],
+   tip:"미소는 마지막에! 팔팔 끓이면 향이 날아가요. 물 400ml당 미소 1큰술이 적당한 간이에요."},
+  {emoji:"🍚",name:"김자반 비빔밥",diff:"★☆☆",time:"5분",
+   ing:["따뜻한 밥 1공기","김자반(조미김가루) 2~3큰술","계란 1개","참기름 1작은술","통깨","간장 약간(선택)"],
+   steps:["계란프라이를 반숙으로 부친다.","따뜻한 밥에 김자반·참기름·깨를 넣고 비빈다.","계란프라이를 얹고 노른자를 터뜨려 비벼 먹는다."],
+   tip:"김자반에 간·기름이 이미 있어 간장은 한 방울이면 충분. 싱거우면 김자반을 더 넣으세요."},
+  {emoji:"🌶️",name:"떡볶이",diff:"★★☆",time:"15분",
+   ing:["떡 300g","어묵 2장","물 2컵(400ml)","고추장 1.5큰술","고춧가루 1큰술","설탕 1.5큰술","간장 1큰술","다진마늘 0.5큰술","대파"],
+   steps:["떡이 딱딱하면 따뜻한 물에 5분 불린다.","냄비에 물과 양념(고추장·고춧가루·설탕·간장·마늘)을 풀고 끓인다.","끓으면 떡·어묵을 넣고 중불에서 저으며 졸인다.","국물이 걸쭉해지면 대파를 넣고 1분 더 끓여 마무리."],
+   tip:"단맛은 기호껏 설탕/물엿으로. 더 깊은맛은 다시다 약간. 너무 졸았으면 물을 조금 더 넣어요."},
+  {emoji:"🍳",name:"계란볶음밥",diff:"★☆☆",time:"10분",
+   ing:["찬밥 1공기","계란 2개","대파","식용유 1큰술","굴소스 1작은술(또는 간장)","소금·후추"],
+   steps:["팬에 기름을 두르고 대파를 볶아 파기름을 낸다.","계란을 풀어 넣고 스크램블한 뒤 밥을 넣어 센 불에 볶는다.","굴소스(또는 간장)·소금·후추로 간하고 고슬하게 볶는다."],
+   tip:"찬밥이 더 고슬해요. 간은 굴소스 1작은술이면 충분, 더 넣으면 짜져요."},
+  {emoji:"🐟",name:"참치마요덮밥",diff:"★☆☆",time:"7분",
+   ing:["밥 1공기","참치캔 1개","마요네즈 1.5큰술","간장 1작은술","설탕 약간","계란 1개","김가루"],
+   steps:["참치는 기름을 꾹 짜고 마요·간장·설탕 약간과 섞는다.","밥 위에 참치마요를 올린다.","계란프라이와 김가루를 얹어 비벼 먹는다."],
+   tip:"참치 기름을 꼭 빼야 안 느끼해요. 매콤하게 원하면 스리라차를 살짝."}
+];
+(function buildRecipes(){
+  const el=$("recipeList"); if(!el) return;
+  el.innerHTML=RECIPES.map((r,i)=>`
+    <div class="rc" data-i="${i}">
+      <div class="rch"><span class="rem">${r.emoji}</span><span class="rnm">${r.name}</span>
+        <span class="rmeta"><span class="rd">${r.diff}</span><br>${r.time}</span><span class="rchev">▾</span></div>
+      <div class="rbody">
+        <div class="rsec"><h4>재료</h4><div class="rings">${r.ing.map(x=>`<span>${x}</span>`).join("")}</div></div>
+        <div class="rsec"><h4>만드는 법</h4><ol class="rsteps">${r.steps.map(s=>`<li>${s}</li>`).join("")}</ol></div>
+        <div class="rtip">💡 ${r.tip}</div>
+      </div>
+    </div>`).join("");
+  el.querySelectorAll(".rc").forEach(c=>{ c.querySelector(".rch").onclick=()=>c.classList.toggle("open"); });
+})();
 
 /* ── 탐색 (시뮬레이터) ── */
 let t={salt:6,sweet:4,sour:2,umami:7,spicy:1}, synergy=0, isGold=false, displayVec={...t};
