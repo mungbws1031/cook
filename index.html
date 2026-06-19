@@ -992,7 +992,9 @@ const SAUCES=[
   {emoji:"🥢",name:"간장치킨",desc:"마늘 향 단짠 간장. 안 매운 사람용 인기.",base:{salt:7,sweet:6,sour:1,umami:5,spicy:2},
    ing:[{n:"간장",g:35,ax:"salt"},{n:"물엿",g:25,ax:"sweet"},{n:"설탕",g:10,ax:"sweet"},{n:"다진마늘",g:12,ax:"umami"},{n:"청양고추",g:8,ax:"spicy"},{n:"후추",g:1,ax:null}]},
   {emoji:"🥚",name:"간장계란밥",desc:"따뜻한 밥에 슥슥 비비는 버터간장. 계란 하나면 완성.",base:{salt:7,sweet:3,sour:1,umami:5,spicy:1},
-   ing:[{n:"간장",g:20,ax:"salt"},{n:"버터",g:10,ax:null},{n:"참기름",g:5,ax:null},{n:"설탕",g:5,ax:"sweet"},{n:"다진마늘",g:5,ax:"umami"},{n:"통깨",g:2,ax:null}]}
+   ing:[{n:"간장",g:20,ax:"salt"},{n:"버터",g:10,ax:null},{n:"참기름",g:5,ax:null},{n:"설탕",g:5,ax:"sweet"},{n:"다진마늘",g:5,ax:"umami"},{n:"통깨",g:2,ax:null}]},
+  {emoji:"🍱",name:"치킨마요",desc:"고소한 마요 + 단짠 데리야끼 간장. 밥에 올리는 치킨마요덮밥 소스.",base:{salt:6,sweet:6,sour:1,umami:5,spicy:1},
+   ing:[{n:"마요네즈",g:30,ax:null},{n:"간장",g:20,ax:"salt"},{n:"설탕",g:10,ax:"sweet"},{n:"물엿",g:12,ax:"sweet"},{n:"다진마늘",g:4,ax:"umami"},{n:"후추",g:1,ax:null}]}
 ];
 const sauceColor=k=>{ const x=TASTES.find(t=>t.key===k); return x?x.color:"#9C9484"; };
 let sauceState={...SAUCES[0].base}, currentSauce=null;
