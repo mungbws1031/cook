@@ -934,6 +934,10 @@ function renderSaved(){
   let html=`<div class="savedhdr">❤️ 찜한 요리 <span>${favs.length}</span></div>`;
   if(!favs.length) html+=`<div class="empty" style="padding:22px 20px">요리 탭에서 🤍를 눌러 찜해보세요.</div>`;
   else html+=`<div id="favWrap">${favs.map(recipeCardHTML).join("")}</div>`;
+  const favSauces=loadFavSauce().map(n=>SAUCES.find(s=>s.name===n)).filter(Boolean);
+  html+=`<div class="savedhdr" style="margin-top:14px">🥫 찜한 소스 <span>${favSauces.length}</span></div>`;
+  if(!favSauces.length) html+=`<div class="empty" style="padding:22px 20px">소스 탭에서 🤍를 눌러 찜해보세요.</div>`;
+  else html+=`<div class="chips" style="padding:0 16px 2px">${favSauces.map(s=>`<button class="chip favsaucechip" data-name="${s.name}">${s.emoji} ${s.name}</button>`).join("")}</div>`;
   html+=`<div class="savedhdr" style="margin-top:14px">🧂 저장한 배합 <span>${calc.length}</span></div>`;
   if(!calc.length) html+=`<div class="empty" style="padding:22px 20px">계산 탭에서 배합을 만들고 💾 저장을 눌러보세요.</div>`;
   else html+=calc.map((s,idx)=>{
@@ -949,6 +953,7 @@ function renderSaved(){
   }).join("");
   $("savedList").innerHTML=html;
   const fw=$("favWrap"); if(fw) wireRecipeCards(fw);
+  $("savedList").querySelectorAll(".favsaucechip").forEach(c=>c.onclick=()=>goSauce(c.dataset.name));
   $("savedList").querySelectorAll(".srow").forEach(row=>{
     row.querySelector(".toggle").onclick=()=>row.classList.toggle("open");
     row.querySelector(".del").onclick=()=>{ const arr2=loadSaved(); arr2.splice(+row.dataset.i,1); writeSaved(arr2); renderSaved(); };
@@ -1138,6 +1143,14 @@ const SAUCE_PROD={
   "애들 돈까스소스":"오뚜기 돈까스소스 + 케첩","부침개 간장":"시판 초간장·맛간장","두부 양념간장":"청정원 맛간장 + 고춧가루",
   "와사비 간장":"S&B 와사비 + 기꼬만 간장","기름장":"참기름 + 맛소금"
 };
+const FAV_SAUCE_KEY="et_fav_sauces";
+function loadFavSauce(){ try{ return JSON.parse(localStorage.getItem(FAV_SAUCE_KEY)||"[]"); }catch(e){ return []; } }
+function saveFavSauce(a){ try{ localStorage.setItem(FAV_SAUCE_KEY, JSON.stringify(a)); }catch(e){} }
+function isFavSauce(n){ return loadFavSauce().includes(n); }
+function toggleFavSauce(name){ let a=loadFavSauce(); a=a.includes(name)?a.filter(x=>x!==name):[name,...a]; saveFavSauce(a); renderSauceRecipe(); renderSaved(); }
+function goSauce(name){ const s=SAUCES.find(x=>x.name===name); if(!s) return; selectSauce(s);
+  document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("on", x.dataset.view==="sauce"));
+  document.querySelectorAll(".view").forEach(x=>x.classList.remove("active")); $("view-sauce").classList.add("active"); window.scrollTo(0,0); }
 SAUCE_CATS.forEach(([key,label])=>{
   const list=SAUCES.filter(s=>sauceCatOf(s)===key); if(!list.length) return;
   const h=document.createElement("div"); h.className="saucecat"; h.textContent=label; sauceChips.appendChild(h);
@@ -1162,9 +1175,10 @@ function renderSauceRecipe(){ const s=currentSauce; if(!s) return;
     return `<div class="ing${dim?' sub':''}"><div class="l"><span class="cdot" style="background:${it.ax?sauceColor(it.ax):'#9C9484'}"></span><div><div class="nm">${it.n}</div></div></div>
       <div class="r">${dim?'<div class="sp">빼기</div>':`<div class="g">${fmtG(g)}<small>g</small></div><div class="sp">🥄 ${spoon}</div>`}</div></div>`;
   }).join("");
-  $("sauceRecipe").innerHTML=`<div class="rcard hero"><h3>🥫 ${s.name} 소스 <span class="heronote">— 2인분 기준</span></h3>${rows}</div>
+  $("sauceRecipe").innerHTML=`<div class="rcard hero"><h3 style="display:flex;align-items:center;gap:6px">🥫 ${s.name} 소스 <span class="heronote">— 2인분 기준</span><button class="favbtn" id="sauceFav" style="margin-left:auto" aria-label="찜">${isFavSauce(s.name)?"❤️":"🤍"}</button></h3>${rows}</div>
     ${SAUCE_PROD[s.name]?`<div class="rcard"><div class="rsummary">🛒 <b>이 맛 시판 제품</b> — ${SAUCE_PROD[s.name]}</div></div>`:""}
     <div class="rcard"><div class="rsummary">위 조절좌(맵기·단맛 등)를 움직이면 재료 양이 <b>실시간</b>으로 바뀌어요. 맵기 0으로 내리면 매운 재료는 '빼기'!</div></div>`;
+  const sf=$("sauceFav"); if(sf) sf.onclick=()=>toggleFavSauce(s.name);
 }
 selectSauce(SAUCES[0]);
 
