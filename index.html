@@ -184,6 +184,9 @@
   .srow .act button{font-size:11.5px;color:var(--muted);background:transparent;border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer}
   .srow .act button.del{color:#C0483C;border-color:rgba(217,138,130,.4)}
   .empty{text-align:center;color:var(--faint);font-size:13px;padding:50px 20px;line-height:1.7}
+  .savedhdr{font-family:var(--mono);font-size:11px;letter-spacing:1px;color:var(--faint);text-transform:uppercase;padding:6px 18px 8px;display:flex;align-items:center;gap:6px}
+  .savedhdr span{background:var(--surface2);border:1px solid var(--border);border-radius:99px;padding:1px 8px;color:var(--muted);font-size:10px}
+  .favbtn{background:none;border:none;font-size:18px;cursor:pointer;padding:2px 4px;line-height:1;flex-shrink:0}
 
   /* ── 탐색(시뮬레이터) ── */
   .radar-wrap{position:relative;padding:6px 8px 0}
@@ -926,9 +929,14 @@ function saveRecipe(title, r){
 }
 function nowStr(){ const d=new Date(); const p=n=>String(n).padStart(2,"0"); return `${d.getFullYear()}.${p(d.getMonth()+1)}.${p(d.getDate())}`; }
 function renderSaved(){
-  const arr=loadSaved();
-  if(!arr.length){ $("savedList").innerHTML=`<div class="empty">아직 저장한 레시피가 없어요.<br>계산 탭에서 배합을 만들고 💾 저장을 눌러보세요.</div>`; return; }
-  $("savedList").innerHTML=arr.map((s,idx)=>{
+  const favs=loadFav().map(n=>RECIPES.find(r=>r.name===n)).filter(Boolean);
+  const calc=loadSaved();
+  let html=`<div class="savedhdr">❤️ 찜한 요리 <span>${favs.length}</span></div>`;
+  if(!favs.length) html+=`<div class="empty" style="padding:22px 20px">요리 탭에서 🤍를 눌러 찜해보세요.</div>`;
+  else html+=`<div id="favWrap">${favs.map(recipeCardHTML).join("")}</div>`;
+  html+=`<div class="savedhdr" style="margin-top:14px">🧂 저장한 배합 <span>${calc.length}</span></div>`;
+  if(!calc.length) html+=`<div class="empty" style="padding:22px 20px">계산 탭에서 배합을 만들고 💾 저장을 눌러보세요.</div>`;
+  else html+=calc.map((s,idx)=>{
     const ing=s.ingredients.map(i=>`${i.name} ${fmtG(i.amountG)}g (≈${i.spoon})`).join(" · ");
     const stars=[1,2,3,4,5].map(n=>`<span class="${n<=s.rating?'on':''}" data-r="${n}">★</span>`).join("");
     return `<div class="srow" data-i="${idx}">
@@ -939,10 +947,12 @@ function renderSaved(){
       <div class="act"><button class="toggle">재료 보기</button><button class="del" data-i="${idx}">삭제</button></div>
     </div>`;
   }).join("");
+  $("savedList").innerHTML=html;
+  const fw=$("favWrap"); if(fw) wireRecipeCards(fw);
   $("savedList").querySelectorAll(".srow").forEach(row=>{
     row.querySelector(".toggle").onclick=()=>row.classList.toggle("open");
     row.querySelector(".del").onclick=()=>{ const arr2=loadSaved(); arr2.splice(+row.dataset.i,1); writeSaved(arr2); renderSaved(); };
-    row.querySelector(".stars").onclick=e=>{ const s=e.target.closest("[data-r]"); if(!s)return; const arr2=loadSaved(); arr2[+row.dataset.i].rating=+s.dataset.r; writeSaved(arr2); renderSaved(); };
+    row.querySelector(".stars").onclick=e=>{ const sp=e.target.closest("[data-r]"); if(!sp)return; const arr2=loadSaved(); arr2[+row.dataset.i].rating=+sp.dataset.r; writeSaved(arr2); renderSaved(); };
   });
 }
 
@@ -983,22 +993,54 @@ const RECIPES=[
   {emoji:"🧈",name:"장조림버터 비빔밥",diff:"★★☆",time:"25분",
    ing:["따뜻한 밥 2공기","소고기 장조림 4~5스푼(또는 다진 소불고기)","애호박·당근·표고 다진 것","계란 2개","김가루 넉넉히","버터 10g","참기름·통깨","비빔간장: 진간장2 : 올리고당1 : 물1 + 참기름 1티스푼"],
    steps:["당근·애호박·버섯을 아주 잘게 다져, 기름 약간과 소금 한 꼬집에 숨이 죽을 때까지 볶는다.","장조림은 잘게 찢어 쓴다. (없으면 다진 소고기 100g을 간장1·올리고당1·맛술1·물2스푼에 국물이 살짝 남게 촉촉하게 볶는다)","계란은 부드러운 스크램블로 익힌다. (정갈하게는 지단처럼 얇게 부쳐 채 썰기)","따뜻한 밥 2공기에 버터 10g·참기름 1스푼을 넣어 살살 섞는다.","밥 위에 야채·고기·계란·김가루를 올리고, 비빔간장을 1스푼씩 넣어가며 비빈다. (밥 1공기당 1~1.5스푼)"],
-   tip:"고추장 대신 달달한 간장소스가 애들 성공률 ↑. 핵심은 장조림+버터+김가루! 마늘 향 싫어하면 빼고, 야채는 잘게 다져 숨기면 '고기계란 비빔밥'처럼 잘 먹어요. 밥은 살짝 촉촉하게."}
+   tip:"고추장 대신 달달한 간장소스가 애들 성공률 ↑. 핵심은 장조림+버터+김가루! 마늘 향 싫어하면 빼고, 야채는 잘게 다져 숨기면 '고기계란 비빔밥'처럼 잘 먹어요. 밥은 살짝 촉촉하게."},
+  {emoji:"🥬",name:"김치전",diff:"★☆☆",time:"15분",
+   ing:["신김치 1컵(잘게)","부침가루 1컵","물 1컵","김치국물 2스푼","청양고추(선택)","식용유 넉넉히"],
+   steps:["신김치를 잘게 썬다.","부침가루+물+김치국물을 주르륵 흐를 정도로 섞고 김치를 넣는다.","팬에 기름 넉넉히 두르고 반죽을 얇게 편다.","중불에 노릇해지면 뒤집어 양면을 바삭하게."],
+   tip:"기름 넉넉 + 얇게 펴야 바삭! 신김치일수록 맛있고, 설탕 약간 넣으면 신맛이 부드러워져요."},
+  {emoji:"🧅",name:"해물파전",diff:"★★☆",time:"20분",
+   ing:["쪽파 한 줌","해물(오징어·새우) 100g","부침가루 1컵","물 1컵","계란 1개","식용유 넉넉히"],
+   steps:["쪽파는 팬 길이로 자르고 해물은 잘게 썬다.","부침가루+물로 반죽을 만든다.","팬에 기름, 쪽파를 깔고 반죽을 살짝 부은 뒤 해물을 올린다.","반쯤 익으면 계란물을 위에 풀어 붓고 노릇하게 뒤집어 익힌다."],
+   tip:"파를 먼저 깔고 반죽은 적게! 센 불에 바삭하게 부쳐 가위로 잘라 초간장에 찍어요."},
+  {emoji:"🥔",name:"감자전",diff:"★★☆",time:"20분",
+   ing:["감자 3개","소금 약간","양파 약간(선택)","식용유 넉넉히"],
+   steps:["감자를 강판이나 믹서로 곱게 간다.","체에 받쳐 물을 짜고, 가라앉은 흰 전분은 다시 섞는다.","소금 약간 넣고, 기름 넉넉한 팬에 한 국자씩 동그랗게 편다.","바닥이 투명·노릇해지면 뒤집어 익힌다."],
+   tip:"가라앉은 전분을 꼭 다시 넣어야 쫀득! 부침가루 없이 감자만으로도 충분해요."},
+  {emoji:"🌿",name:"부추전",diff:"★☆☆",time:"15분",
+   ing:["부추 한 줌","부침가루 1컵","물 1컵","청양고추(선택)","식용유 넉넉히"],
+   steps:["부추를 5cm로 썬다.","부침가루+물 반죽에 부추를 살살 섞는다.","기름 넉넉한 팬에 얇게 펴서 중불에 양면을 노릇하게."],
+   tip:"부추는 살짝만 섞어야 풋내 없이 향긋. 오징어 조금 넣으면 더 맛있어요."}
 ];
-(function buildRecipes(){
-  const el=$("recipeList"); if(!el) return;
-  el.innerHTML=RECIPES.map((r,i)=>`
-    <div class="rc" data-i="${i}">
-      <div class="rch"><span class="rem">${r.emoji}</span><span class="rnm">${r.name}</span>
-        <span class="rmeta"><span class="rd">${r.diff}</span><br>${r.time}</span><span class="rchev">▾</span></div>
-      <div class="rbody">
-        <div class="rsec"><h4>재료</h4><div class="rings">${r.ing.map(x=>`<span>${x}</span>`).join("")}</div></div>
-        <div class="rsec"><h4>만드는 법</h4><ol class="rsteps">${r.steps.map(s=>`<li>${s}</li>`).join("")}</ol></div>
-        <div class="rtip">💡 ${r.tip}</div>
-      </div>
-    </div>`).join("");
-  el.querySelectorAll(".rc").forEach(c=>{ c.querySelector(".rch").onclick=()=>c.classList.toggle("open"); });
-})();
+const FAV_KEY="et_fav_recipes";
+function loadFav(){ try{ return JSON.parse(localStorage.getItem(FAV_KEY)||"[]"); }catch(e){ return []; } }
+function saveFav(a){ try{ localStorage.setItem(FAV_KEY, JSON.stringify(a)); }catch(e){} }
+function isFav(name){ return loadFav().includes(name); }
+function toggleFav(name){
+  let a=loadFav(); a = a.includes(name) ? a.filter(x=>x!==name) : [name, ...a]; saveFav(a);
+  const on=a.includes(name);
+  document.querySelectorAll(".favbtn").forEach(b=>{ if(b.dataset.name===name) b.textContent=on?"❤️":"🤍"; });
+  renderSaved();
+}
+function recipeCardHTML(r){
+  return `<div class="rc" data-name="${r.name}">
+    <div class="rch"><span class="rem">${r.emoji}</span><span class="rnm">${r.name}</span>
+      <span class="rmeta"><span class="rd">${r.diff}</span><br>${r.time}</span>
+      <button class="favbtn" data-name="${r.name}" aria-label="찜">${isFav(r.name)?"❤️":"🤍"}</button><span class="rchev">▾</span></div>
+    <div class="rbody">
+      <div class="rsec"><h4>재료</h4><div class="rings">${r.ing.map(x=>`<span>${x}</span>`).join("")}</div></div>
+      <div class="rsec"><h4>만드는 법</h4><ol class="rsteps">${r.steps.map(s=>`<li>${s}</li>`).join("")}</ol></div>
+      <div class="rtip">💡 ${r.tip}</div>
+    </div></div>`;
+}
+function wireRecipeCards(container){
+  container.querySelectorAll(".rc").forEach(c=>{
+    c.querySelector(".rch").addEventListener("click", e=>{ if(e.target.closest(".favbtn")) return; c.classList.toggle("open"); });
+    const fb=c.querySelector(".favbtn");
+    if(fb) fb.addEventListener("click", e=>{ e.stopPropagation(); toggleFav(fb.dataset.name); });
+  });
+}
+function buildRecipes(){ const el=$("recipeList"); if(!el) return; el.innerHTML=RECIPES.map(recipeCardHTML).join(""); wireRecipeCards(el); }
+buildRecipes();
 
 /* ── 소스 배합소 ── */
 const SAUCE_DENS={"간장":1.15,"설탕":0.85,"고추장":1.2,"고춧가루":0.5,"올리고당":1.35,"물엿":1.35,"꿀":1.4,"케첩":1.1,"마요네즈":0.95,"식초":1.0,"다진마늘":1.0,"버터":0.96,"우유/생크림":1.0,"다시다":0.65,"두반장":1.2,"마라소스":1.0,"청양고추":1.0,"후추":0.5,"화자오":0.5,"카레가루":0.5,"참기름":0.92,"통깨":0.6,"물":1.0,"된장":1.15,"생강":1.0,"미림":1.0,"춘장":1.2,"굴소스":1.2,"식용유":0.92,"양파":1.0,"머스터드":1.0,"레몬즙":1.0,"우스터소스":1.1,"피클":1.0,"파마산치즈":1.0,"소금":1.2,"사과즙":1.0,"적포도주":1.0,"와사비":1.0};
