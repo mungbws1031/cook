@@ -68,6 +68,8 @@
   .chip:active{transform:scale(.95)}
   .chip.on{color:#1a130c;background:var(--accent);border-color:var(--accent)}
   .chip.on.cool{background:var(--gold);border-color:var(--gold)}
+  .saucecat{flex-basis:100%;width:100%;font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--faint);margin:11px 0 1px;text-transform:uppercase}
+  .saucecat:first-child{margin-top:2px}
 
   .wrow{display:flex;gap:8px;align-items:stretch;margin-bottom:9px}
   .wrow input[type=number]{flex:1;min-width:0;font-family:var(--mono);font-size:22px;font-weight:700;color:var(--text);
@@ -986,7 +988,7 @@ const RECIPES=[
 })();
 
 /* ── 소스 배합소 ── */
-const SAUCE_DENS={"간장":1.15,"설탕":0.85,"고추장":1.2,"고춧가루":0.5,"올리고당":1.35,"물엿":1.35,"꿀":1.4,"케첩":1.1,"마요네즈":0.95,"식초":1.0,"다진마늘":1.0,"버터":0.96,"우유/생크림":1.0,"다시다":0.65,"두반장":1.2,"마라소스":1.0,"청양고추":1.0,"후추":0.5,"화자오":0.5,"카레가루":0.5,"참기름":0.92,"통깨":0.6,"물":1.0,"된장":1.15,"생강":1.0,"미림":1.0,"춘장":1.2,"굴소스":1.2,"식용유":0.92,"양파":1.0,"머스터드":1.0,"레몬즙":1.0,"우스터소스":1.1,"피클":1.0,"파마산치즈":1.0,"소금":1.2};
+const SAUCE_DENS={"간장":1.15,"설탕":0.85,"고추장":1.2,"고춧가루":0.5,"올리고당":1.35,"물엿":1.35,"꿀":1.4,"케첩":1.1,"마요네즈":0.95,"식초":1.0,"다진마늘":1.0,"버터":0.96,"우유/생크림":1.0,"다시다":0.65,"두반장":1.2,"마라소스":1.0,"청양고추":1.0,"후추":0.5,"화자오":0.5,"카레가루":0.5,"참기름":0.92,"통깨":0.6,"물":1.0,"된장":1.15,"생강":1.0,"미림":1.0,"춘장":1.2,"굴소스":1.2,"식용유":0.92,"양파":1.0,"머스터드":1.0,"레몬즙":1.0,"우스터소스":1.1,"피클":1.0,"파마산치즈":1.0,"소금":1.2,"사과즙":1.0,"적포도주":1.0};
 const SAUCES=[
   {emoji:"🍗",name:"허니콤보",desc:"바삭한 위에 달콤짭짤 간장+꿀. 안 매운 단짠의 정석.",base:{salt:6,sweet:8,sour:1,umami:5,spicy:1},
    ing:[{n:"간장",g:30,ax:"salt"},{n:"꿀",g:30,ax:"sweet"},{n:"올리고당",g:15,ax:"sweet"},{n:"다진마늘",g:10,ax:"umami"},{n:"버터",g:10,ax:null},{n:"후추",g:1,ax:null}]},
@@ -1037,13 +1039,33 @@ const SAUCES=[
   {emoji:"🍝",name:"까르보나라",desc:"크림+치즈 진한 파스타 소스.",base:{salt:5,sweet:2,sour:1,umami:6,spicy:1},
    ing:[{n:"우유/생크림",g:120,ax:null},{n:"파마산치즈",g:25,ax:"umami"},{n:"버터",g:15,ax:null},{n:"다진마늘",g:6,ax:"umami"},{n:"소금",g:2,ax:"salt"},{n:"후추",g:1,ax:null}]},
   {emoji:"🍖",name:"BBQ소스",desc:"폭립·바베큐·구이에. 달콤새콤 훈연 단짠.",base:{salt:5,sweet:7,sour:3,umami:4,spicy:2},
-   ing:[{n:"케첩",g:40,ax:"sweet"},{n:"우스터소스",g:15,ax:"salt"},{n:"설탕",g:20,ax:"sweet"},{n:"간장",g:8,ax:"salt"},{n:"식초",g:8,ax:"sour"},{n:"다진마늘",g:6,ax:"umami"}]}
+   ing:[{n:"케첩",g:40,ax:"sweet"},{n:"우스터소스",g:15,ax:"salt"},{n:"설탕",g:20,ax:"sweet"},{n:"간장",g:8,ax:"salt"},{n:"식초",g:8,ax:"sour"},{n:"다진마늘",g:6,ax:"umami"}]},
+  {emoji:"🍱",name:"경양식 돈까스",desc:"명동st 옛날 경양식. 묽고 부드러운 갈색 데미글라스풍.",base:{salt:5,sweet:6,sour:3,umami:4,spicy:1},
+   ing:[{n:"우스터소스",g:25,ax:"salt"},{n:"케첩",g:25,ax:"sweet"},{n:"설탕",g:12,ax:"sweet"},{n:"버터",g:12,ax:null},{n:"양파",g:30,ax:null},{n:"우유/생크림",g:30,ax:null},{n:"후추",g:1,ax:null}]},
+  {emoji:"🐗",name:"일본식 돈카츠",desc:"불독소스st. 과일·채소 걸쭉한 단짠새콤.",base:{salt:5,sweet:7,sour:4,umami:5,spicy:1},
+   ing:[{n:"우스터소스",g:25,ax:"salt"},{n:"케첩",g:25,ax:"sweet"},{n:"설탕",g:15,ax:"sweet"},{n:"간장",g:8,ax:"salt"},{n:"식초",g:6,ax:"sour"},{n:"사과즙",g:20,ax:null},{n:"다진마늘",g:4,ax:"umami"}]},
+  {emoji:"🥘",name:"수제 데미글라스",desc:"고급 돈까스집st. 적포도주·버터로 졸인 진한 갈색.",base:{salt:6,sweet:5,sour:3,umami:6,spicy:1},
+   ing:[{n:"우스터소스",g:25,ax:"salt"},{n:"케첩",g:20,ax:"sweet"},{n:"적포도주",g:25,ax:null},{n:"버터",g:15,ax:null},{n:"양파",g:30,ax:null},{n:"설탕",g:8,ax:"sweet"},{n:"다진마늘",g:5,ax:"umami"}]}
 ];
 const sauceColor=k=>{ const x=TASTES.find(t=>t.key===k); return x?x.color:"#9C9484"; };
 let sauceState={...SAUCES[0].base}, currentSauce=null;
 const sauceChips=$("sauceChips");
-SAUCES.forEach(s=>{ const el=document.createElement("button"); el.className="chip"; el.textContent=s.emoji+" "+s.name;
-  el.onclick=()=>selectSauce(s); sauceChips.appendChild(el); });
+const SAUCE_CAT={
+  "허니콤보":"chicken","양념치킨":"chicken","간장치킨":"chicken",
+  "불닭볶음":"tteok","엽기떡볶이":"tteok","국민학교 떡볶이":"tteok","제육볶음 양념":"tteok","닭갈비 양념":"tteok",
+  "간장계란밥":"rice","치킨마요":"rice","본죽st 비빔장":"rice","데리야끼":"rice",
+  "쌈장":"korean","초고추장":"korean","간장초장":"korean",
+  "허니머스타드":"fry","돈가스소스":"fry","스윗칠리":"fry","타르타르":"fry","경양식 돈까스":"fry","일본식 돈카츠":"fry","수제 데미글라스":"fry",
+  "로제":"western","갈릭버터간장":"western","까르보나라":"western","BBQ소스":"western",
+  "마라(마라장)":"chinese","짜장(춘장)":"chinese"
+};
+const SAUCE_CATS=[["chicken","🍗 치킨·양념"],["tteok","🌶️ 떡볶이·매콤볶음"],["rice","🍚 밥·비빔·덮밥"],["korean","🥬 한식 디핑·무침"],["fry","🍤 튀김·돈까스"],["western","🍝 양식·크림"],["chinese","🥡 중식"],["기타","✨ 기타"]];
+const sauceCatOf=s=>SAUCE_CAT[s.name]||"기타";
+SAUCE_CATS.forEach(([key,label])=>{
+  const list=SAUCES.filter(s=>sauceCatOf(s)===key); if(!list.length) return;
+  const h=document.createElement("div"); h.className="saucecat"; h.textContent=label; sauceChips.appendChild(h);
+  list.forEach(s=>{ const el=document.createElement("button"); el.className="chip"; el.textContent=s.emoji+" "+s.name; el.onclick=()=>selectSauce(s); sauceChips.appendChild(el); });
+});
 const sauceSlidersEl=$("sauceSliders"), sauceInputs={}, sauceVals={};
 TASTES.forEach(x=>{ const wrap=document.createElement("div"); wrap.className="sl";
   wrap.innerHTML=`<div class="top"><span class="left"><span class="dot" style="background:${x.color};box-shadow:0 0 8px ${x.color}"></span><span class="nm">${x.label}</span></span><span class="val" style="color:${x.color}" id="sv-${x.key}">0</span></div>`;
