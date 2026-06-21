@@ -986,7 +986,7 @@ const RECIPES=[
 })();
 
 /* ── 소스 배합소 ── */
-const SAUCE_DENS={"간장":1.15,"설탕":0.85,"고추장":1.2,"고춧가루":0.5,"올리고당":1.35,"물엿":1.35,"꿀":1.4,"케첩":1.1,"마요네즈":0.95,"식초":1.0,"다진마늘":1.0,"버터":0.96,"우유/생크림":1.0,"다시다":0.65,"두반장":1.2,"마라소스":1.0,"청양고추":1.0,"후추":0.5,"화자오":0.5,"카레가루":0.5,"참기름":0.92,"통깨":0.6};
+const SAUCE_DENS={"간장":1.15,"설탕":0.85,"고추장":1.2,"고춧가루":0.5,"올리고당":1.35,"물엿":1.35,"꿀":1.4,"케첩":1.1,"마요네즈":0.95,"식초":1.0,"다진마늘":1.0,"버터":0.96,"우유/생크림":1.0,"다시다":0.65,"두반장":1.2,"마라소스":1.0,"청양고추":1.0,"후추":0.5,"화자오":0.5,"카레가루":0.5,"참기름":0.92,"통깨":0.6,"물":1.0};
 const SAUCES=[
   {emoji:"🍗",name:"허니콤보",desc:"바삭한 위에 달콤짭짤 간장+꿀. 안 매운 단짠의 정석.",base:{salt:6,sweet:8,sour:1,umami:5,spicy:1},
    ing:[{n:"간장",g:30,ax:"salt"},{n:"꿀",g:30,ax:"sweet"},{n:"올리고당",g:15,ax:"sweet"},{n:"다진마늘",g:10,ax:"umami"},{n:"버터",g:10,ax:null},{n:"후추",g:1,ax:null}]},
@@ -1007,7 +1007,9 @@ const SAUCES=[
   {emoji:"🥚",name:"간장계란밥",desc:"따뜻한 밥에 슥슥 비비는 버터간장. 계란 하나면 완성.",base:{salt:7,sweet:3,sour:1,umami:5,spicy:1},
    ing:[{n:"간장",g:20,ax:"salt"},{n:"버터",g:10,ax:null},{n:"참기름",g:5,ax:null},{n:"설탕",g:5,ax:"sweet"},{n:"다진마늘",g:5,ax:"umami"},{n:"통깨",g:2,ax:null}]},
   {emoji:"🍱",name:"치킨마요",desc:"고소한 마요 + 단짠 데리야끼 간장. 밥에 올리는 치킨마요덮밥 소스.",base:{salt:6,sweet:6,sour:1,umami:5,spicy:1},
-   ing:[{n:"마요네즈",g:30,ax:null},{n:"간장",g:20,ax:"salt"},{n:"설탕",g:10,ax:"sweet"},{n:"물엿",g:12,ax:"sweet"},{n:"다진마늘",g:4,ax:"umami"},{n:"후추",g:1,ax:null}]}
+   ing:[{n:"마요네즈",g:30,ax:null},{n:"간장",g:20,ax:"salt"},{n:"설탕",g:10,ax:"sweet"},{n:"물엿",g:12,ax:"sweet"},{n:"다진마늘",g:4,ax:"umami"},{n:"후추",g:1,ax:null}]},
+  {emoji:"🥣",name:"본죽st 비빔장",desc:"안 매운 달달 간장 비빔장. 본죽st 정갈한 비빔밥에 — 애들 성공률 최고.",base:{salt:7,sweet:5,sour:1,umami:4,spicy:1},
+   ing:[{n:"간장",g:30,ax:"salt"},{n:"올리고당",g:15,ax:"sweet"},{n:"물",g:15,ax:null},{n:"참기름",g:5,ax:null},{n:"다진마늘",g:3,ax:"umami"},{n:"통깨",g:2,ax:null}]}
 ];
 const sauceColor=k=>{ const x=TASTES.find(t=>t.key===k); return x?x.color:"#9C9484"; };
 let sauceState={...SAUCES[0].base}, currentSauce=null;
