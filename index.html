@@ -378,7 +378,7 @@
       <div class="hint">두 감칠맛원을 함께 쓰면(간장+멸치/고기 등) 글루탐산×이노신산 시너지로 감칠맛이 최대 1.5배 [R1]</div>
     </div>
     <div class="preset-row" id="presets"></div>
-    <div class="card" style="margin-top:6px"><div style="font-size:11px;color:var(--muted);margin-bottom:3px">이 맛은 이런 요리에 →</div>
+    <div class="card" style="margin-top:6px"><div style="font-size:11px;color:var(--muted);margin-bottom:3px">이 맛으로 만들 수 있는 요리 →</div>
       <div style="font-family:var(--display);font-size:16px;font-weight:600;color:var(--g-mid)" id="dish"></div></div>
     <div class="combos"><div class="lab">이 맛 내려면 — 기성품 조합</div><div id="combos"></div></div>
   </section>
@@ -768,6 +768,19 @@ function matchDish(t){const{salt,sweet,sour,umami,spicy}=t;
   if(spicy>=6&&salt>=4)return"제육·매운 볶음 양념"; if(sour>=5&&sweet>=4)return"새콤달콤 무침·초장";
   if(umami>=6&&sweet>=4&&spicy<4)return"불고기·갈비 양념"; if(umami>=6&&salt>=5)return"감칠 볶음·볶음밥";
   if(sweet>=5&&sour>=3)return"탕수·디핑 소스"; if(salt>=4&&umami>=4)return"기본 간장 베이스 조림"; return"범용 만능장 (간 맞추는 중)";}
+const DISHES=[
+ {n:"미역국",v:{salt:6,sweet:1,sour:0,umami:7,spicy:0}},{n:"된장찌개",v:{salt:7,sweet:1,sour:1,umami:8,spicy:2}},
+ {n:"김치찌개",v:{salt:7,sweet:2,sour:4,umami:7,spicy:6}},{n:"순두부찌개",v:{salt:7,sweet:1,sour:2,umami:7,spicy:7}},
+ {n:"콩나물국",v:{salt:5,sweet:0,sour:0,umami:4,spicy:1}},{n:"계란찜",v:{salt:5,sweet:1,sour:0,umami:6,spicy:0}},
+ {n:"어묵탕",v:{salt:6,sweet:2,sour:0,umami:7,spicy:1}},{n:"불고기",v:{salt:7,sweet:6,sour:1,umami:7,spicy:1}},
+ {n:"갈비찜",v:{salt:7,sweet:6,sour:1,umami:8,spicy:1}},{n:"잡채",v:{salt:6,sweet:6,sour:1,umami:6,spicy:1}},
+ {n:"제육볶음",v:{salt:7,sweet:5,sour:1,umami:6,spicy:8}},{n:"닭볶음탕",v:{salt:7,sweet:5,sour:1,umami:7,spicy:7}},
+ {n:"떡볶이",v:{salt:6,sweet:6,sour:1,umami:6,spicy:8}},{n:"비빔밥(고추장)",v:{salt:6,sweet:4,sour:2,umami:6,spicy:6}},
+ {n:"볶음밥",v:{salt:7,sweet:2,sour:0,umami:7,spicy:1}},{n:"간장계란밥",v:{salt:7,sweet:3,sour:0,umami:5,spicy:1}},
+ {n:"카레",v:{salt:5,sweet:4,sour:1,umami:6,spicy:3}},{n:"탕수육",v:{salt:4,sweet:7,sour:6,umami:4,spicy:1}},
+ {n:"오징어초무침",v:{salt:5,sweet:6,sour:7,umami:4,spicy:5}},{n:"장조림",v:{salt:7,sweet:4,sour:0,umami:7,spicy:0}}
+];
+function nearestDishes(t,n=3){ const d=v=>Math.sqrt(TASTES.reduce((a,{key})=>a+(t[key]-v[key])**2,0)); return [...DISHES].sort((a,b)=>d(a.v)-d(b.v)).slice(0,n).map(x=>x.n); }
 function nearestCombos(t,combos,n=2){const dist=v=>Math.sqrt(TASTES.reduce((a,{key})=>a+(t[key]-v[key])**2,0));return [...combos].sort((a,b)=>dist(a.v)-dist(b.v)).slice(0,n);}
 function suggestGolden(target){let best={...target},bestScore=deliciousness(best);
   for(let i=0;i<60;i++)for(const{key}of TASTES)for(const d of[-0.5,0.5]){const cand={...best,[key]:Math.max(0,Math.min(10,best[key]+d))};const s=deliciousness(cand);if(s>bestScore){best=cand;bestScore=s;}}return{vector:best,score:bestScore};}
@@ -1071,6 +1084,18 @@ const SAUCE_CAT={
 };
 const SAUCE_CATS=[["chicken","🍗 치킨·양념"],["tteok","🌶️ 떡볶이·매콤볶음"],["rice","🍚 밥·비빔·덮밥"],["korean","🥬 한식 디핑·찍먹"],["fry","🍤 튀김·돈까스"],["western","🍝 양식·크림"],["chinese","🥡 중식"],["기타","✨ 기타"]];
 const sauceCatOf=s=>SAUCE_CAT[s.name]||"기타";
+const SAUCE_PROD={
+  "허니콤보":"시판 허니갈릭·간장마늘 소스","불닭볶음":"삼양 불닭소스","엽기떡볶이":"엽떡 밀키트 소스","국민학교 떡볶이":"오뚜기 옛날 떡볶이 소스",
+  "양념치킨":"오뚜기 양념치킨 소스","로제":"시판 로제 떡볶이 소스","마라(마라장)":"하이디라오 마라장·두반장","간장치킨":"시판 간장치킨 소스",
+  "간장계란밥":"진간장 + 버터","치킨마요":"기꼬만 데리야끼 + 큐피 마요","본죽st 비빔장":"청정원 양조간장 + 올리고당",
+  "쌈장":"해찬들 쌈장","초고추장":"오뚜기 초고추장","간장초장":"시판 초간장","제육볶음 양념":"청정원 제육볶음 양념",
+  "데리야끼":"기꼬만 데리야끼 소스","닭갈비 양념":"시판 춘천닭갈비 양념","짜장(춘장)":"사자표 춘장 · 오뚜기 짜장",
+  "허니머스타드":"하인즈 허니머스타드","돈가스소스":"오뚜기 돈까스소스","스윗칠리":"팬타이 스윗칠리소스","타르타르":"오뚜기·큐피 타르타르소스",
+  "갈릭버터간장":"버터 + 진간장 + 다진마늘","까르보나라":"오뚜기 까르보나라 소스","BBQ소스":"스위트베이비레이스 · 하인즈 BBQ",
+  "경양식 돈까스":"오뚜기 돈까스소스","일본식 돈카츠":"불독(Bull-Dog) 돈카츠소스","수제 데미글라스":"하인즈 데미글라스",
+  "애들 돈까스소스":"오뚜기 돈까스소스 + 케첩","부침개 간장":"시판 초간장·맛간장","두부 양념간장":"청정원 맛간장 + 고춧가루",
+  "와사비 간장":"S&B 와사비 + 기꼬만 간장","기름장":"참기름 + 맛소금"
+};
 SAUCE_CATS.forEach(([key,label])=>{
   const list=SAUCES.filter(s=>sauceCatOf(s)===key); if(!list.length) return;
   const h=document.createElement("div"); h.className="saucecat"; h.textContent=label; sauceChips.appendChild(h);
@@ -1096,6 +1121,7 @@ function renderSauceRecipe(){ const s=currentSauce; if(!s) return;
       <div class="r">${dim?'<div class="sp">빼기</div>':`<div class="g">${fmtG(g)}<small>g</small></div><div class="sp">🥄 ${spoon}</div>`}</div></div>`;
   }).join("");
   $("sauceRecipe").innerHTML=`<div class="rcard hero"><h3>🥫 ${s.name} 소스 <span class="heronote">— 2인분 기준</span></h3>${rows}</div>
+    ${SAUCE_PROD[s.name]?`<div class="rcard"><div class="rsummary">🛒 <b>이 맛 시판 제품</b> — ${SAUCE_PROD[s.name]}</div></div>`:""}
     <div class="rcard"><div class="rsummary">위 조절좌(맵기·단맛 등)를 움직이면 재료 양이 <b>실시간</b>으로 바뀌어요. 맵기 0으로 내리면 매운 재료는 '빼기'!</div></div>`;
 }
 selectSauce(SAUCES[0]);
@@ -1185,7 +1211,7 @@ function renderExplore(){
   $("synVal").textContent=synergy.toFixed(1); $("synRange").value=synergy;
   const v=chefVerdict(t,score); $("chefTitle").textContent="“"+v.title+"”"; $("chefBody").textContent=v.body;
   $("chef").classList.toggle("goldc",v.mood==="gold"); $("chefTitle").style.color=v.mood==="gold"?"var(--gold)":"var(--text)";
-  $("dish").textContent=matchDish(t);
+  $("dish").textContent=nearestDishes(t,3).join(" · ");
   const combos=nearestCombos(t,PRODUCT_COMBOS,2);
   $("combos").innerHTML=combos.map((c,i)=>`<div class="combo ${i===0?'first':''}"><div><div class="cn">${c.name}</div><div class="cd">${c.dish}</div></div><div class="cr">${c.ratio}</div></div>`).join("");
   // 조건 만족 시(가까운 맛 스타일) 말풍선 잠깐 표시
