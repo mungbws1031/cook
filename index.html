@@ -204,6 +204,8 @@
   .mr-dish{flex:1;min-width:0;font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .mr-dish.empty{color:var(--faint)}
   .mrow .mealsel{position:absolute;inset:0;width:100%;height:100%;opacity:0;border:none;cursor:pointer}
+  .shopwrap{display:flex;flex-wrap:wrap;gap:6px;padding:2px 16px 18px}
+  .shopwrap span{font-size:12px;color:var(--text);background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px}
 
   /* ── 탐색(시뮬레이터) ── */
   .radar-wrap{position:relative;padding:6px 8px 0}
@@ -1240,8 +1242,9 @@ function renderShop(){
   const m=loadMeal(); const names=[];
   MEAL_DAYS.forEach(([dk])=>slotsFor(dk).forEach(([sk])=>{ const n=(m[dk]||{})[sk]; if(n&&!names.includes(n)) names.push(n); }));
   if(!names.length){ el.innerHTML=`<div class="empty" style="padding:24px 20px">끼니를 채우면 장보기 리스트가 자동으로 만들어져요 🛒</div>`; return; }
-  const ings=[]; names.forEach(n=>{ const r=RECIPES.find(x=>x.name===n); if(r) r.ing.forEach(i=>{ if(!ings.includes(i)) ings.push(i); }); });
-  el.innerHTML=`<div class="savedhdr" style="margin-top:6px">🛒 이번 주 장보기 <span>${ings.length}</span></div><div class="rings" style="padding:0 16px 18px">${ings.map(x=>`<span>${x}</span>`).join("")}</div>`;
+  const SKIP=["따뜻한","찬","다진","생","구운","삶은","불린","잘게"];
+  const items=[]; names.forEach(n=>{ const r=RECIPES.find(x=>x.name===n); if(r) r.ing.forEach(i=>{ const p=i.split(" "); let nm=(SKIP.includes(p[0])&&p[1])?p[1]:p[0]; nm=nm.replace(/[:：]$/,""); if(nm && !items.includes(nm)) items.push(nm); }); });
+  el.innerHTML=`<div class="savedhdr" style="margin-top:8px">🛒 이번 주 장보기 <span>${items.length}</span></div><div class="shopwrap">${items.map(x=>`<span>${x}</span>`).join("")}</div>`;
 }
 function mealFill(){ const mm={}; MEAL_DAYS.forEach(([dk])=>{ mm[dk]={}; slotsFor(dk).forEach(([sk])=>{ mm[dk][sk]=RECIPES[Math.floor(Math.random()*RECIPES.length)].name; }); }); saveMeal(mm); buildMeal(); }
 function mealClear(){ saveMeal({}); buildMeal(); }
