@@ -192,18 +192,18 @@
   .mealtools{display:flex;gap:8px;padding:10px 16px 2px}
   .mealtools button{flex:1;font-family:var(--body);font-weight:700;font-size:13px;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:11px;cursor:pointer}
   .mealtools button:active{transform:scale(.97)}
-  .mday{margin:0 16px 8px;padding:11px 13px;background:var(--surface);border:1px solid var(--border);border-radius:13px}
-  .mday.wk{display:flex;align-items:center;gap:10px;padding:9px 13px}
-  .mdname2{font-family:var(--display);font-size:15px;font-weight:600;width:18px;flex-shrink:0;text-align:center}
-  .mtag{font-family:var(--mono);font-size:9px;color:var(--faint);background:var(--surface2);border:1px solid var(--border);border-radius:99px;padding:2px 8px;flex-shrink:0}
-  .mday.wkend{background:linear-gradient(180deg,rgba(95,162,54,.07),var(--surface));border-color:rgba(95,162,54,.3)}
-  .mday.wkend.sun{background:linear-gradient(180deg,rgba(214,72,60,.06),var(--surface));border-color:rgba(214,72,60,.3)}
-  .mdh{display:flex;align-items:center;gap:8px}
-  .mdname{font-family:var(--display);font-size:15px;font-weight:600}
-  .mday.sat .mdname{color:#3F6FD8}.mday.sun .mdname{color:#D6483C}
-  .mslotrow{display:flex;align-items:center;gap:9px;margin-top:8px}
-  .mslotrow .ml{width:30px;font-size:12px;color:var(--muted);flex-shrink:0}
-  .mealsel{flex:1;min-width:0;font-family:var(--body);font-size:13px;color:var(--text);background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:9px 10px}
+  .mcap{font-size:11px;color:var(--muted);padding:2px 18px 6px}
+  .mlist{margin:0 16px;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--surface)}
+  .mrow{position:relative;display:flex;align-items:center;gap:10px;padding:12px 14px}
+  .mrow.dayfirst{border-top:1px solid var(--border)}
+  .mlist .mrow:first-child{border-top:none}
+  .mrow.wknd{background:rgba(95,162,54,.05)}
+  .mr-day{width:22px;font-family:var(--display);font-weight:700;font-size:14px;flex-shrink:0}
+  .mrow.sat .mr-day{color:#3F6FD8}.mrow.sun .mr-day{color:#D6483C}
+  .mr-slot{width:32px;font-size:11px;color:var(--muted);flex-shrink:0}
+  .mr-dish{flex:1;min-width:0;font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mr-dish.empty{color:var(--faint)}
+  .mrow .mealsel{position:absolute;inset:0;width:100%;height:100%;opacity:0;border:none;cursor:pointer}
 
   /* ── 탐색(시뮬레이터) ── */
   .radar-wrap{position:relative;padding:6px 8px 0}
@@ -1224,20 +1224,15 @@ function slotsFor(dk){ return (dk==="sat"||dk==="sun") ? MEAL_SLOTS : [["d","저
 function buildMeal(){
   const el=$("mealPlan"); if(!el) return;
   const m=loadMeal();
-  const opts=cur=>`<option value="">— 비움 —</option>`+RECIPES.map(r=>`<option value="${r.name}"${r.name===cur?" selected":""}>${r.emoji} ${r.name}</option>`).join("");
-  const sel=(dk,sk,cur)=>`<select class="mealsel" data-d="${dk}" data-s="${sk}">${opts(cur||"")}</select>`;
-  let html=`<div class="savedhdr">평일 · 저녁</div>`;
-  MEAL_DAYS.filter(([dk])=>dk!=="sat"&&dk!=="sun").forEach(([dk,dl])=>{
-    html+=`<div class="mday wk"><span class="mdname2">${dl}</span><span class="mtag">저녁</span>${sel(dk,"d",(m[dk]||{}).d)}</div>`;
+  const opt=cur=>`<option value="">— 없음 —</option>`+RECIPES.map(r=>`<option value="${r.name}"${r.name===cur?" selected":""}>${r.emoji} ${r.name}</option>`).join("");
+  let rows="";
+  MEAL_DAYS.forEach(([dk,dl])=>{ const wknd=dk==="sat"||dk==="sun"; const day=m[dk]||{};
+    slotsFor(dk).forEach(([sk,sl],i)=>{ const cur=day[sk]||""; const r=cur?RECIPES.find(x=>x.name===cur):null;
+      rows+=`<div class="mrow ${dk}${i===0?" dayfirst":""}${wknd?" wknd":""}"><span class="mr-day">${i===0?dl:""}</span><span class="mr-slot">${sl}</span><span class="mr-dish${cur?"":" empty"}">${r?(r.emoji+" "+r.name):"＋ 추가"}</span><select class="mealsel" data-d="${dk}" data-s="${sk}">${opt(cur)}</select></div>`;
+    });
   });
-  html+=`<div class="savedhdr" style="margin-top:12px">주말 · 아침·점심·저녁</div>`;
-  MEAL_DAYS.filter(([dk])=>dk==="sat"||dk==="sun").forEach(([dk,dl])=>{
-    const day=m[dk]||{};
-    html+=`<div class="mday wkend ${dk}"><div class="mdh"><span class="mdname">${dl}요일</span><span class="mtag">주말 3끼</span></div>`+
-      MEAL_SLOTS.map(([sk,sl])=>`<div class="mslotrow"><span class="ml">${sl}</span>${sel(dk,sk,day[sk])}</div>`).join("")+`</div>`;
-  });
-  el.innerHTML=html;
-  el.querySelectorAll(".mealsel").forEach(s=>s.onchange=()=>{ const mm=loadMeal(); (mm[s.dataset.d]=mm[s.dataset.d]||{})[s.dataset.s]=s.value; saveMeal(mm); renderShop(); });
+  el.innerHTML=`<div class="mcap">평일은 저녁만 · 주말은 아침·점심·저녁</div><div class="mlist">${rows}</div>`;
+  el.querySelectorAll(".mealsel").forEach(s=>s.onchange=()=>{ const mm=loadMeal(); (mm[s.dataset.d]=mm[s.dataset.d]||{})[s.dataset.s]=s.value; saveMeal(mm); buildMeal(); renderShop(); });
   renderShop();
 }
 function renderShop(){
