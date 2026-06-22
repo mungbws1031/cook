@@ -192,16 +192,18 @@
   .mealtools{display:flex;gap:8px;padding:10px 16px 2px}
   .mealtools button{flex:1;font-family:var(--body);font-weight:700;font-size:13px;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:11px;cursor:pointer}
   .mealtools button:active{transform:scale(.97)}
-  .mealcal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;padding:10px 10px 4px;align-items:start}
-  .calday{display:flex;flex-direction:column;gap:4px}
-  .caldh{text-align:center;font-size:12px;font-weight:700;color:var(--muted)}
-  .caldh.sat{color:#3F6FD8}.caldh.sun{color:#D6483C}
-  .calcell{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:6px 2px;min-height:48px;overflow:hidden}
-  .calday.wknd .calcell{background:var(--surface2)}
-  .calsl{font-size:8px;color:var(--faint)}
-  .calemoji{font-size:19px;line-height:1.1}
-  .calname{font-size:8px;line-height:1.05;color:var(--muted);text-align:center;word-break:keep-all;max-height:26px;overflow:hidden}
-  .calcell select{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:none}
+  .mday{margin:0 16px 8px;padding:11px 13px;background:var(--surface);border:1px solid var(--border);border-radius:13px}
+  .mday.wk{display:flex;align-items:center;gap:10px;padding:9px 13px}
+  .mdname2{font-family:var(--display);font-size:15px;font-weight:600;width:18px;flex-shrink:0;text-align:center}
+  .mtag{font-family:var(--mono);font-size:9px;color:var(--faint);background:var(--surface2);border:1px solid var(--border);border-radius:99px;padding:2px 8px;flex-shrink:0}
+  .mday.wkend{background:linear-gradient(180deg,rgba(95,162,54,.07),var(--surface));border-color:rgba(95,162,54,.3)}
+  .mday.wkend.sun{background:linear-gradient(180deg,rgba(214,72,60,.06),var(--surface));border-color:rgba(214,72,60,.3)}
+  .mdh{display:flex;align-items:center;gap:8px}
+  .mdname{font-family:var(--display);font-size:15px;font-weight:600}
+  .mday.sat .mdname{color:#3F6FD8}.mday.sun .mdname{color:#D6483C}
+  .mslotrow{display:flex;align-items:center;gap:9px;margin-top:8px}
+  .mslotrow .ml{width:30px;font-size:12px;color:var(--muted);flex-shrink:0}
+  .mealsel{flex:1;min-width:0;font-family:var(--body);font-size:13px;color:var(--text);background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:9px 10px}
 
   /* ── 탐색(시뮬레이터) ── */
   .radar-wrap{position:relative;padding:6px 8px 0}
@@ -1222,14 +1224,20 @@ function slotsFor(dk){ return (dk==="sat"||dk==="sun") ? MEAL_SLOTS : [["d","저
 function buildMeal(){
   const el=$("mealPlan"); if(!el) return;
   const m=loadMeal();
-  const opts=cur=>`<option value="">비움</option>`+RECIPES.map(r=>`<option value="${r.name}"${r.name===cur?" selected":""}>${r.emoji} ${r.name}</option>`).join("");
-  el.innerHTML=`<div class="mealcal">`+MEAL_DAYS.map(([dk,dl])=>{
-    const wknd=dk==="sat"||dk==="sun"; const day=m[dk]||{};
-    const cells=slotsFor(dk).map(([sk,sl])=>{ const cur=day[sk]||""; const r=cur?RECIPES.find(x=>x.name===cur):null;
-      return `<label class="calcell"><span class="calsl">${sl}</span><span class="calemoji">${r?r.emoji:"＋"}</span><span class="calname">${r?r.name:""}</span><select class="mealsel" data-d="${dk}" data-s="${sk}">${opts(cur)}</select></label>`; }).join("");
-    return `<div class="calday${wknd?' wknd':''}"><div class="caldh ${dk==='sat'?'sat':dk==='sun'?'sun':''}">${dl}</div>${cells}</div>`;
-  }).join("")+`</div>`;
-  el.querySelectorAll(".mealsel").forEach(sel=>sel.onchange=()=>{ const mm=loadMeal(); (mm[sel.dataset.d]=mm[sel.dataset.d]||{})[sel.dataset.s]=sel.value; saveMeal(mm); buildMeal(); renderShop(); });
+  const opts=cur=>`<option value="">— 비움 —</option>`+RECIPES.map(r=>`<option value="${r.name}"${r.name===cur?" selected":""}>${r.emoji} ${r.name}</option>`).join("");
+  const sel=(dk,sk,cur)=>`<select class="mealsel" data-d="${dk}" data-s="${sk}">${opts(cur||"")}</select>`;
+  let html=`<div class="savedhdr">평일 · 저녁</div>`;
+  MEAL_DAYS.filter(([dk])=>dk!=="sat"&&dk!=="sun").forEach(([dk,dl])=>{
+    html+=`<div class="mday wk"><span class="mdname2">${dl}</span><span class="mtag">저녁</span>${sel(dk,"d",(m[dk]||{}).d)}</div>`;
+  });
+  html+=`<div class="savedhdr" style="margin-top:12px">주말 · 아침·점심·저녁</div>`;
+  MEAL_DAYS.filter(([dk])=>dk==="sat"||dk==="sun").forEach(([dk,dl])=>{
+    const day=m[dk]||{};
+    html+=`<div class="mday wkend ${dk}"><div class="mdh"><span class="mdname">${dl}요일</span><span class="mtag">주말 3끼</span></div>`+
+      MEAL_SLOTS.map(([sk,sl])=>`<div class="mslotrow"><span class="ml">${sl}</span>${sel(dk,sk,day[sk])}</div>`).join("")+`</div>`;
+  });
+  el.innerHTML=html;
+  el.querySelectorAll(".mealsel").forEach(s=>s.onchange=()=>{ const mm=loadMeal(); (mm[s.dataset.d]=mm[s.dataset.d]||{})[s.dataset.s]=s.value; saveMeal(mm); renderShop(); });
   renderShop();
 }
 function renderShop(){
