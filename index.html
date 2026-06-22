@@ -188,6 +188,16 @@
   .savedhdr span{background:var(--surface2);border:1px solid var(--border);border-radius:99px;padding:1px 8px;color:var(--muted);font-size:10px}
   .favbtn{background:none;border:none;font-size:18px;cursor:pointer;padding:2px 4px;line-height:1;flex-shrink:0}
 
+  /* 일주일 식단표 */
+  .mealtools{display:flex;gap:8px;padding:10px 16px 2px}
+  .mealtools button{flex:1;font-family:var(--body);font-weight:700;font-size:13px;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:11px;cursor:pointer}
+  .mealtools button:active{transform:scale(.97)}
+  .mealday{background:var(--surface);border:1px solid var(--border);border-radius:14px;margin:8px 16px;padding:10px 14px}
+  .mealdh{font-family:var(--display);font-size:15px;font-weight:600;margin-bottom:6px}
+  .mealrow{display:flex;align-items:center;gap:10px;padding:5px 0}
+  .mealsl{width:34px;font-size:12px;color:var(--muted);flex-shrink:0}
+  .mealsel{flex:1;min-width:0;font-family:var(--body);font-size:13px;color:var(--text);background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:9px 10px}
+
   /* ── 탐색(시뮬레이터) ── */
   .radar-wrap{position:relative;padding:6px 8px 0}
   .glow{position:absolute;inset:6px 8px 0;border-radius:20px;pointer-events:none;
@@ -413,6 +423,20 @@
     <div class="result" id="sauceRecipe"></div>
   </section>
 
+  <!-- ════════ 일주일 식단표 ════════ -->
+  <section class="view" id="view-meal">
+    <div class="hd">
+      <div class="kicker">Weekly Plan · 일주일 식단</div>
+      <div class="row">
+        <div class="avatar" style="background:linear-gradient(135deg,#5FA236,#2f6a1c)">📅</div>
+        <div><div class="name">일주일 식단표</div><div class="sub">요일·끼니에 요리를 배치하면 장보기까지</div></div>
+      </div>
+    </div>
+    <div class="mealtools"><button id="mealFill">🎲 자동 채우기</button><button id="mealClear">전체 비우기</button></div>
+    <div id="mealPlan"></div>
+    <div id="mealShop"></div>
+  </section>
+
   <!-- ════════ 저장 ════════ -->
   <section class="view" id="view-saved">
     <div class="hd">
@@ -431,6 +455,7 @@
     <button data-view="calc"><span class="ic">🧮</span><span class="tx">계산</span></button>
     <button data-view="recipe"><span class="ic">🍙</span><span class="tx">요리</span></button>
     <button data-view="sauce"><span class="ic">🥫</span><span class="tx">소스</span></button>
+    <button data-view="meal"><span class="ic">📅</span><span class="tx">식단</span></button>
     <button data-view="fix"><span class="ic">🩹</span><span class="tx">보정</span></button>
     <button data-view="saved"><span class="ic">★</span><span class="tx">저장</span></button>
   </nav>
@@ -1181,6 +1206,36 @@ function renderSauceRecipe(){ const s=currentSauce; if(!s) return;
   const sf=$("sauceFav"); if(sf) sf.onclick=()=>toggleFavSauce(s.name);
 }
 selectSauce(SAUCES[0]);
+
+/* ── 일주일 식단표 ── */
+const MEAL_KEY="et_meal_plan";
+const MEAL_DAYS=[["mon","월"],["tue","화"],["wed","수"],["thu","목"],["fri","금"],["sat","토"],["sun","일"]];
+const MEAL_SLOTS=[["b","아침"],["l","점심"],["d","저녁"]];
+function loadMeal(){ try{ return JSON.parse(localStorage.getItem(MEAL_KEY)||"{}"); }catch(e){ return {}; } }
+function saveMeal(m){ try{ localStorage.setItem(MEAL_KEY, JSON.stringify(m)); }catch(e){} }
+function buildMeal(){
+  const el=$("mealPlan"); if(!el) return;
+  const m=loadMeal();
+  const opts=cur=>`<option value="">— 비움 —</option>`+RECIPES.map(r=>`<option value="${r.name}"${r.name===cur?" selected":""}>${r.emoji} ${r.name}</option>`).join("");
+  el.innerHTML=MEAL_DAYS.map(([dk,dl])=>{ const day=m[dk]||{};
+    return `<div class="mealday"><div class="mealdh">${dl}요일</div>${MEAL_SLOTS.map(([sk,sl])=>`<div class="mealrow"><span class="mealsl">${sl}</span><select class="mealsel" data-d="${dk}" data-s="${sk}">${opts(day[sk]||"")}</select></div>`).join("")}</div>`;
+  }).join("");
+  el.querySelectorAll(".mealsel").forEach(sel=>sel.onchange=()=>{ const mm=loadMeal(); (mm[sel.dataset.d]=mm[sel.dataset.d]||{})[sel.dataset.s]=sel.value; saveMeal(mm); renderShop(); });
+  renderShop();
+}
+function renderShop(){
+  const el=$("mealShop"); if(!el) return;
+  const m=loadMeal(); const names=[];
+  MEAL_DAYS.forEach(([dk])=>MEAL_SLOTS.forEach(([sk])=>{ const n=(m[dk]||{})[sk]; if(n&&!names.includes(n)) names.push(n); }));
+  if(!names.length){ el.innerHTML=`<div class="empty" style="padding:24px 20px">끼니를 채우면 장보기 리스트가 자동으로 만들어져요 🛒</div>`; return; }
+  const ings=[]; names.forEach(n=>{ const r=RECIPES.find(x=>x.name===n); if(r) r.ing.forEach(i=>{ if(!ings.includes(i)) ings.push(i); }); });
+  el.innerHTML=`<div class="savedhdr" style="margin-top:6px">🛒 이번 주 장보기 <span>${ings.length}</span></div><div class="rings" style="padding:0 16px 18px">${ings.map(x=>`<span>${x}</span>`).join("")}</div>`;
+}
+function mealFill(){ const mm={}; MEAL_DAYS.forEach(([dk])=>{ mm[dk]={}; MEAL_SLOTS.forEach(([sk])=>{ mm[dk][sk]=RECIPES[Math.floor(Math.random()*RECIPES.length)].name; }); }); saveMeal(mm); buildMeal(); }
+function mealClear(){ saveMeal({}); buildMeal(); }
+if($("mealFill")) $("mealFill").onclick=mealFill;
+if($("mealClear")) $("mealClear").onclick=mealClear;
+buildMeal();
 
 /* ── 탐색 (시뮬레이터) ── */
 let t={salt:6,sweet:4,sour:2,umami:7,spicy:1}, synergy=0, isGold=false, displayVec={...t};
