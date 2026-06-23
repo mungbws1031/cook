@@ -207,6 +207,27 @@
   .shopwrap{display:flex;flex-wrap:wrap;gap:6px;padding:2px 16px 18px}
   .shopwrap span{font-size:12px;color:var(--text);background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px}
 
+  /* 냉장고 */
+  .frbar{padding:10px 16px 4px;display:flex;flex-direction:column;gap:8px}
+  .frbar input,.frbar select{font-family:var(--body);font-size:13px;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+  .frbar #frName{width:100%}
+  .frbar .frrow{display:flex;gap:7px}
+  .frbar #frDate{flex-shrink:0;min-width:0}
+  .frbar #frDays{flex:1;min-width:0}
+  .frbar #frAdd{flex-shrink:0;font-weight:700;font-size:13px;color:#1a130c;background:var(--accent);border:none;border-radius:10px;padding:0 16px;cursor:pointer}
+  .frnotif{display:block;margin:2px 16px 6px;font-size:12px;color:var(--accent);background:none;border:none;cursor:pointer}
+  .fralert{margin:4px 16px 10px;padding:10px 12px;background:rgba(224,162,60,.12);border:1px solid rgba(224,162,60,.35);border-radius:11px;font-size:12.5px;color:#6B5A2E}
+  .fritem{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 16px 8px;padding:11px 13px;background:var(--surface);border:1px solid var(--border);border-radius:12px}
+  .fritem.soon{border-color:rgba(224,162,60,.5);background:rgba(224,162,60,.06)}
+  .fritem.exp{border-color:rgba(214,72,60,.5);background:rgba(214,72,60,.07)}
+  .fritem .fn{font-size:14.5px;font-weight:700}
+  .fritem .fmeta{font-size:11px;color:var(--muted);margin-top:2px}
+  .fritem .frr{display:flex;align-items:center;gap:9px;flex-shrink:0}
+  .fritem .fdday{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap}
+  .fritem.soon .fdday{color:var(--warn)}
+  .fritem.exp .fdday{color:var(--danger)}
+  .fritem .frdel{background:none;border:none;color:var(--faint);font-size:18px;cursor:pointer;line-height:1;padding:0 2px}
+
   /* ── 탐색(시뮬레이터) ── */
   .radar-wrap{position:relative;padding:6px 8px 0}
   .glow{position:absolute;inset:6px 8px 0;border-radius:20px;pointer-events:none;
@@ -251,8 +272,9 @@
     border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom);z-index:20}
   @media (min-width:480px){.nav{position:absolute;border-radius:0 0 28px 28px}}
   .nav button{flex:1;background:none;border:none;color:var(--faint);padding:9px 2px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;height:var(--navh)}
-  .nav button .ic{font-size:19px;line-height:1}
-  .nav button .tx{font-size:10px;font-weight:700}
+  .nav button{padding:9px 1px 8px}
+  .nav button .ic{font-size:18px;line-height:1}
+  .nav button .tx{font-size:9.5px;font-weight:700}
   .nav button.on{color:var(--accent)}
   .nav button.on .ic{transform:translateY(-1px)}
 
@@ -446,6 +468,23 @@
     <div id="mealShop"></div>
   </section>
 
+  <!-- ════════ 냉장고 ════════ -->
+  <section class="view" id="view-fridge">
+    <div class="hd">
+      <div class="kicker">My Fridge · 재료 관리</div>
+      <div class="row">
+        <div class="avatar" style="background:linear-gradient(135deg,#3F6FD8,#274a9a)">🧊</div>
+        <div><div class="name">냉장고</div><div class="sub">산 날짜 넣으면 언제까지 쓸지 알려줘요</div></div>
+      </div>
+    </div>
+    <div class="frbar">
+      <input type="text" id="frName" placeholder="재료명 (예: 삼겹살, 우유, 상추)" />
+      <div class="frrow"><input type="date" id="frDate" /><select id="frDays"></select><button id="frAdd">추가</button></div>
+    </div>
+    <button class="frnotif" id="frNotif">🔔 만료 알림 켜기</button>
+    <div id="frList"></div>
+  </section>
+
   <!-- ════════ 저장 ════════ -->
   <section class="view" id="view-saved">
     <div class="hd">
@@ -465,6 +504,7 @@
     <button data-view="recipe"><span class="ic">🍙</span><span class="tx">요리</span></button>
     <button data-view="sauce"><span class="ic">🥫</span><span class="tx">소스</span></button>
     <button data-view="meal"><span class="ic">📅</span><span class="tx">식단</span></button>
+    <button data-view="fridge"><span class="ic">🧊</span><span class="tx">냉장</span></button>
     <button data-view="fix"><span class="ic">🩹</span><span class="tx">보정</span></button>
     <button data-view="saved"><span class="ic">★</span><span class="tx">저장</span></button>
   </nav>
@@ -862,6 +902,7 @@ $("nav").addEventListener("click", e=>{ const b=e.target.closest("button"); if(!
   document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));
   $("view-"+v).classList.add("active");
   if(v==="saved") renderSaved();
+  if(v==="fridge") renderFridge();
   window.scrollTo(0,0);
 });
 
@@ -1278,6 +1319,57 @@ function mealClear(){ saveMeal({}); buildMeal(); }
 if($("mealFill")) $("mealFill").onclick=mealFill;
 if($("mealClear")) $("mealClear").onclick=mealClear;
 buildMeal();
+
+/* ── 냉장고 재료 관리 ── */
+const FRIDGE_KEY="et_fridge";
+const FR_PRESETS=[["잎채소·상추",4],["채소·뿌리채소",14],["과일",7],["소·돼지고기",3],["닭고기",2],["생선·해산물",2],["다진고기",1],["계란",21],["우유·유제품",7],["두부(개봉)",3],["김치",30],["소스·장류(개봉)",30],["밥·반찬",3],["냉동식품",90]];
+function loadFridge(){ try{ return JSON.parse(localStorage.getItem(FRIDGE_KEY)||"[]"); }catch(e){ return []; } }
+function saveFridge(a){ try{ localStorage.setItem(FRIDGE_KEY, JSON.stringify(a)); }catch(e){} }
+function frPad(n){ return String(n).padStart(2,"0"); }
+function frToday(){ const d=new Date(); return d.getFullYear()+"-"+frPad(d.getMonth()+1)+"-"+frPad(d.getDate()); }
+function frAddDays(ds,n){ const d=new Date(ds+"T00:00:00"); d.setDate(d.getDate()+(n|0)); return d.getFullYear()+"-"+frPad(d.getMonth()+1)+"-"+frPad(d.getDate()); }
+function frDday(useby){ return Math.round((new Date(useby+"T00:00:00") - new Date(frToday()+"T00:00:00"))/86400000); }
+function frUseby(x){ return frAddDays(x.bought, x.days); }
+let _frNotified=false;
+function initFridge(){
+  const dt=$("frDate"); if(dt&&!dt.value) dt.value=frToday();
+  const ds=$("frDays"); if(ds&&!ds.options.length){ ds.innerHTML=FR_PRESETS.map(([n,d])=>`<option value="${d}">${n} · ${d}일</option>`).join(""); ds.value="14"; }
+  if($("frAdd")) $("frAdd").onclick=frAddItem;
+  if($("frNotif")) $("frNotif").onclick=enableFridgeNotif;
+  renderFridge();
+  if(!_frNotified && "Notification" in window && Notification.permission==="granted"){ _frNotified=true; fridgeNotify(false); }
+}
+function frAddItem(){
+  const name=($("frName").value||"").trim(); if(!name){ $("frName").focus(); return; }
+  const arr=loadFridge(); arr.push({name, bought:($("frDate").value||frToday()), days:parseInt($("frDays").value)||7}); saveFridge(arr);
+  $("frName").value=""; renderFridge();
+}
+function renderFridge(){
+  const el=$("frList"); if(!el) return;
+  const arr=loadFridge().map((x,i)=>{ const ub=frUseby(x); return {...x,i,ub,dd:frDday(ub)}; }).sort((a,b)=>a.dd-b.dd);
+  if(!arr.length){ el.innerHTML=`<div class="empty" style="padding:30px 20px">냉장고에 산 재료를 추가해보세요.<br>산 날짜로 '언제까지 써야 하는지' 자동 계산돼요 🧊</div>`; return; }
+  const exp=arr.filter(x=>x.dd<0).length, soon=arr.filter(x=>x.dd>=0&&x.dd<=2).length;
+  let banner="";
+  if(exp||soon) banner=`<div class="fralert">🔔 ${exp?`<b style="color:var(--danger)">만료 ${exp}개</b>`:""}${exp&&soon?" · ":""}${soon?`<b style="color:var(--warn)">임박 ${soon}개</b>`:""} — 빨리 쓰세요!</div>`;
+  el.innerHTML=banner+arr.map(x=>{
+    const cls=x.dd<0?"exp":x.dd<=2?"soon":"";
+    const dt=x.dd<0?`만료 +${-x.dd}일`:x.dd===0?"오늘까지":`D-${x.dd}`;
+    return `<div class="fritem ${cls}"><div class="fl"><div class="fn">${x.name}</div><div class="fmeta">${x.bought} 구입 · ~${x.ub}까지</div></div><div class="frr"><span class="fdday">${dt}</span><button class="frdel" data-i="${x.i}" aria-label="삭제">×</button></div></div>`;
+  }).join("");
+  el.querySelectorAll(".frdel").forEach(b=>b.onclick=()=>{ const a=loadFridge(); a.splice(+b.dataset.i,1); saveFridge(a); renderFridge(); });
+}
+function fridgeNotify(force){
+  const arr=loadFridge().filter(x=>frDday(frUseby(x))<=2);
+  if(!arr.length){ if(force) alert("곧 만료될 재료가 없어요 👍"); return; }
+  const msg=arr.map(x=>{ const d=frDday(frUseby(x)); return x.name+" ("+(d<0?"만료":d===0?"오늘":"D-"+d)+")"; }).join(", ");
+  if("Notification" in window && Notification.permission==="granted") new Notification("🧊 냉장고 — 곧 써야 해요", {body:msg, icon:"./icon-192.png"});
+  else if(force) alert("⚠️ 곧 써야 할 재료\n\n"+msg);
+}
+function enableFridgeNotif(){
+  if(!("Notification" in window)){ alert("이 브라우저는 알림을 지원하지 않아요. 대신 냉장 탭 상단에 경고가 떠요."); return; }
+  Notification.requestPermission().then(p=>{ if(p==="granted") fridgeNotify(true); else alert("알림이 꺼져 있어요. 냉장 탭을 열면 상단에 임박/만료 경고가 표시됩니다."); });
+}
+initFridge();
 
 /* ── 탐색 (시뮬레이터) ── */
 let t={salt:6,sweet:4,sour:2,umami:7,spicy:1}, synergy=0, isGold=false, displayVec={...t};
