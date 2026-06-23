@@ -227,6 +227,12 @@
   .fritem.soon .fdday{color:var(--warn)}
   .fritem.exp .fdday{color:var(--danger)}
   .fritem .frdel{background:none;border:none;color:var(--faint);font-size:18px;cursor:pointer;line-height:1;padding:0 2px}
+  .frpaste{margin:2px 16px 6px;border:1px solid var(--border);border-radius:11px;background:var(--surface);overflow:hidden}
+  .frpaste summary{padding:11px 13px;font-size:12.5px;font-weight:700;color:var(--text);cursor:pointer;list-style:none}
+  .frpaste summary::-webkit-details-marker{display:none}
+  .frpaste[open] summary{border-bottom:1px solid var(--border)}
+  .frpaste textarea{display:block;width:100%;box-sizing:border-box;min-height:96px;border:none;background:transparent;color:var(--text);font-family:var(--body);font-size:13px;line-height:1.5;padding:11px 13px;resize:vertical;outline:none}
+  .frpaste #frPasteBtn{margin:0 13px 12px;font-weight:700;font-size:13px;color:#1a130c;background:var(--accent);border:none;border-radius:10px;padding:9px 18px;cursor:pointer}
 
   /* ── 탐색(시뮬레이터) ── */
   .radar-wrap{position:relative;padding:6px 8px 0}
@@ -481,6 +487,11 @@
       <input type="text" id="frName" placeholder="재료명 (예: 삼겹살, 우유, 상추)" />
       <div class="frrow"><input type="date" id="frDate" /><select id="frDays"></select><button id="frAdd">추가</button></div>
     </div>
+    <details class="frpaste" id="frPasteDetails">
+      <summary>📋 쿠팡·마트 주문내역 붙여넣기 (자동 입력)</summary>
+      <textarea id="frPaste" placeholder="주문한 상품 목록을 복사해 붙여넣으세요. 한 줄에 한 상품씩이면 더 정확해요.&#10;예) 곰곰 신선한 우유 900ml&#10;    동물복지 대란 30구&#10;    국내산 삼겹살 500g"></textarea>
+      <button id="frPasteBtn">자동 입력</button>
+    </details>
     <button class="frnotif" id="frNotif">🔔 만료 알림 켜기</button>
     <div id="frList"></div>
   </section>
@@ -1336,6 +1347,7 @@ function initFridge(){
   const ds=$("frDays"); if(ds&&!ds.options.length){ ds.innerHTML=FR_PRESETS.map(([n,d])=>`<option value="${d}">${n} · ${d}일</option>`).join(""); ds.value="14"; }
   if($("frAdd")) $("frAdd").onclick=frAddItem;
   if($("frNotif")) $("frNotif").onclick=enableFridgeNotif;
+  if($("frPasteBtn")) $("frPasteBtn").onclick=frImportOrder;
   renderFridge();
   if(!_frNotified && "Notification" in window && Notification.permission==="granted"){ _frNotified=true; fridgeNotify(false); }
 }
@@ -1368,6 +1380,55 @@ function fridgeNotify(force){
 function enableFridgeNotif(){
   if(!("Notification" in window)){ alert("이 브라우저는 알림을 지원하지 않아요. 대신 냉장 탭 상단에 경고가 떠요."); return; }
   Notification.requestPermission().then(p=>{ if(p==="granted") fridgeNotify(true); else alert("알림이 꺼져 있어요. 냉장 탭을 열면 상단에 임박/만료 경고가 표시됩니다."); });
+}
+/* 주문내역 붙여넣기 → 식품 자동 추출 (키워드별 보관기간 추정) */
+const FOOD_KW=[
+  {re:/(다진고기|다짐육|민찌|간고기)/, days:1, name:"다진고기"},
+  {re:/(삼겹|목살|항정|앞다리|돼지|소고기|한우|차돌|등심|안심|불고기|스테이크|베이컨|소시지|소세지|햄|갈비|족발|보쌈|스팸|런천미트|캔햄)/, days:3, name:"고기"},
+  {re:/(닭|계육|닭가슴|닭다리|닭안심)/, days:2, name:"닭고기"},
+  {re:/(연어|광어|고등어|갈치|꽁치|생선|새우|오징어|문어|조개|전복|낙지|주꾸미|멸치|명태|동태|해산물|초밥|훈제연어)/, days:2, name:"해산물"},
+  {re:/(계란|달걀|대란|특란|왕란|메추리알)/, days:21, name:"계란"},
+  {re:/(우유|멸균우유|두유|초코우유|바나나우유)/, days:7, name:"우유"},
+  {re:/(요거트|요구르트|치즈|버터|생크림|휘핑|크림)/, days:14, name:"유제품"},
+  {re:/(두부|순두부|연두부)/, days:3, name:"두부"},
+  {re:/(상추|깻잎|시금치|쌈채|샐러드|부추|미나리|루꼴라|청경채|치커리|로메인|쑥갓)/, days:4, name:"잎채소"},
+  {re:/(양파|당근|감자|고구마|마늘|대파|쪽파|애호박|오이|파프리카|피망|버섯|양배추|브로콜리|가지|토마토|콩나물|숙주|고추)/, days:14, name:"채소"},
+  {re:/(사과|바나나|딸기|포도|오렌지|복숭아|수박|참외|블루베리|키위|망고|체리|자두|멜론|파인애플|샤인머스캣|귤)/, days:7, name:"과일"},
+  {re:/(김치|깍두기|총각김치|열무김치)/, days:30, name:"김치"},
+  {re:/(간장|고추장|된장|쌈장|소스|케첩|마요|굴소스|액젓|식초|드레싱|스리라차|춘장|다시다|연두|미림|올리고당|물엿|꿀)/, days:60, name:"소스·장류"},
+  {re:/(식빵|베이글|크로와상|모닝빵|바게트|단팥빵|빵)/, days:5, name:"빵"},
+  {re:/(가래떡|떡볶이떡|절편|떡국떡|인절미)/, days:5, name:"떡"},
+  {re:/(어묵|맛살|만두|냉동|튀김|돈가스|핫도그|너겟)/, days:30, name:"냉동·가공"},
+  {re:/(즉석밥|밀키트|컵밥|국밥|라면|즉석국|레토르트)/, days:5, name:"간편식"}
+];
+function frMatch(line){ for(const k of FOOD_KW){ if(k.re.test(line)) return k; } return null; }
+function frParseOrder(text){
+  const out=[];
+  (text||"").split(/[\n\r]+/).forEach(raw=>{
+    let line=raw.trim(); if(!line) return;
+    if(/^[\d,.\s₩원\-x×*•·]+$/i.test(line)) return;        // 가격·수량만
+    const k=frMatch(line); if(!k) return;
+    let name=line.replace(/₩/g,"")
+      .replace(/\d+(\.\d+)?\s*(개입|인분|ml|kg|g|l|개|입|구|매|포|팩|봉|병|호|미|t)/gi,"")  // 수량+단위
+      .replace(/\d[\d,]*\s*원/g,"")                                                        // 가격
+      .replace(/[xX×]\s*\d+/g,"").replace(/\d[\d,]*/g,"")                                   // 배수·잔여 숫자
+      .replace(/(로켓프레시|로켓배송|새벽배송|무료배송|판매자|브랜드|옵션\s*:?|수량|택1)/g,"")
+      .replace(/^[•·\-✔✓\s]+/,"").replace(/[\[\]\(\)]/g," ").replace(/\s{2,}/g," ").trim();
+    if(name.length<2) name=k.name;
+    out.push({name:name.slice(0,22), days:k.days});
+  });
+  return out;
+}
+function frImportOrder(){
+  const items=frParseOrder($("frPaste")&&$("frPaste").value);
+  if(!items.length){ alert("식품을 못 찾았어요 😅\n상품명이 한 줄에 하나씩 들어가게 복사해 붙여넣어 보세요."); return; }
+  const arr=loadFridge(), t=frToday();
+  items.forEach(it=>arr.push({name:it.name, bought:t, days:it.days}));
+  saveFridge(arr);
+  if($("frPaste")) $("frPaste").value="";
+  const d=$("frPasteDetails"); if(d) d.open=false;
+  renderFridge();
+  alert(items.length+"개 재료를 냉장고에 추가했어요 🧊\n(날짜·보관기간이 다르면 삭제 후 다시 넣어 조절하세요)");
 }
 initFridge();
 
