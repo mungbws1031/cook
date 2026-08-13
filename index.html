@@ -227,6 +227,17 @@
   .fritem.soon .fdday{color:var(--warn)}
   .fritem.exp .fdday{color:var(--danger)}
   .fritem .frdel{background:none;border:none;color:var(--faint);font-size:18px;cursor:pointer;line-height:1;padding:0 2px}
+  .frsug{margin:0 16px 8px;border:1px solid var(--border);border-radius:12px;background:var(--surface);padding:11px 13px;cursor:pointer}
+  .frsug:active{background:var(--surface2)}
+  .frsug .fsh{display:flex;align-items:center;gap:10px}
+  .frsug .fsem{font-size:22px;line-height:1}
+  .frsug .fsn{flex:1;font-weight:700;font-size:14px;color:var(--text)}
+  .frsug .fsbadge{display:inline-block;font-size:10.5px;font-weight:800;color:var(--warn);background:rgba(201,138,30,.12);border-radius:999px;padding:2px 8px;margin-left:4px;vertical-align:1px}
+  .frsug .fsmeta{font-weight:500;font-size:11.5px;color:var(--faint);margin-top:2px}
+  .frsug .fschev{color:var(--faint);font-size:16px}
+  .frsug .fschips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+  .frsug .fschips span{font-size:11px;padding:3px 9px;border-radius:999px;background:var(--surface2);border:1px solid var(--border);color:var(--muted)}
+  .frsug .fschips span.soon{color:var(--warn);border-color:var(--warn);font-weight:700}
   .frpaste{margin:2px 16px 6px;border:1px solid var(--border);border-radius:11px;background:var(--surface);overflow:hidden}
   .frpaste summary{padding:11px 13px;font-size:12.5px;font-weight:700;color:var(--text);cursor:pointer;list-style:none}
   .frpaste summary::-webkit-details-marker{display:none}
@@ -494,6 +505,7 @@
     </details>
     <button class="frnotif" id="frNotif">🔔 만료 알림 켜기</button>
     <div id="frList"></div>
+    <div id="frSuggest"></div>
   </section>
 
   <!-- ════════ 저장 ════════ -->
@@ -1359,7 +1371,7 @@ function frAddItem(){
 function renderFridge(){
   const el=$("frList"); if(!el) return;
   const arr=loadFridge().map((x,i)=>{ const ub=frUseby(x); return {...x,i,ub,dd:frDday(ub)}; }).sort((a,b)=>a.dd-b.dd);
-  if(!arr.length){ el.innerHTML=`<div class="empty" style="padding:30px 20px">냉장고에 산 재료를 추가해보세요.<br>산 날짜로 '언제까지 써야 하는지' 자동 계산돼요 🧊</div>`; return; }
+  if(!arr.length){ el.innerHTML=`<div class="empty" style="padding:30px 20px">냉장고에 산 재료를 추가해보세요.<br>산 날짜로 '언제까지 써야 하는지' 자동 계산돼요 🧊</div>`; renderFridgeSuggest([]); return; }
   const exp=arr.filter(x=>x.dd<0).length, soon=arr.filter(x=>x.dd>=0&&x.dd<=2).length;
   let banner="";
   if(exp||soon) banner=`<div class="fralert">🔔 ${exp?`<b style="color:var(--danger)">만료 ${exp}개</b>`:""}${exp&&soon?" · ":""}${soon?`<b style="color:var(--warn)">임박 ${soon}개</b>`:""} — 빨리 쓰세요!</div>`;
@@ -1369,6 +1381,71 @@ function renderFridge(){
     return `<div class="fritem ${cls}"><div class="fl"><div class="fn">${x.name}</div><div class="fmeta">${x.bought} 구입 · ~${x.ub}까지</div></div><div class="frr"><span class="fdday">${dt}</span><button class="frdel" data-i="${x.i}" aria-label="삭제">×</button></div></div>`;
   }).join("");
   el.querySelectorAll(".frdel").forEach(b=>b.onclick=()=>{ const a=loadFridge(); a.splice(+b.dataset.i,1); saveFridge(a); renderFridge(); });
+  renderFridgeSuggest(arr);
+}
+/* 냉장고 재료 → 만들 수 있는 요리 추천 (임박 재료 우선) */
+const FRS_ALIAS=[
+  ["계란","달걀","대란","특란","왕란"],
+  ["대파","쪽파","파채"],
+  ["돼지고기","삼겹살","목살","앞다리","항정살"],
+  ["소고기","한우","차돌","등심","안심살","우둔"],
+  ["식빵","빵"],
+  ["밥","즉석밥","햇반","공기밥"],
+  ["떡볶이떡","가래떡","떡국떡","절편"],
+  ["김밥김","구운김","조미김","돌김"],
+  ["새우","칵테일새우","흰다리새우"],
+  ["양상추","상추","로메인"]
+];
+const FRS_STOP=["약간","조금","적당량","선택","기호","취향껏","또는","소금","물","식용유","설탕","후추"];
+function frsTokens(ing){
+  return ing.replace(/\(.*?\)/g,"").split(/\s+/)
+    .filter(w=>/[가-힣]/.test(w)&&!/\d/.test(w))
+    .flatMap(w=>w.split(/[·,]/))
+    .map(w=>w.trim())
+    .filter(w=>w.length>=1&&!FRS_STOP.includes(w));
+}
+function frsMatchName(frName,kw){
+  const a=frName.replace(/\s/g,""), b=kw.replace(/\s/g,"");
+  if(a===b) return true;
+  if(a.length>=2&&b.length>=2&&(a.includes(b)||b.includes(a))) return true;
+  for(const g of FRS_ALIAS){ if(g.some(t=>a.includes(t))&&g.some(t=>b.includes(t))) return true; }
+  return false;
+}
+function frsSuggest(arr){
+  const fresh=arr.filter(x=>x.dd>=0); // 만료된 재료는 추천에 안 씀
+  const out=[];
+  RECIPES.forEach(r=>{
+    const kws=[...new Set(r.ing.flatMap(frsTokens))];
+    const matched=[], soon=[];
+    fresh.forEach(x=>{
+      if(matched.includes(x.name)) return;
+      if(kws.some(k=>frsMatchName(x.name,k))){ matched.push(x.name); if(x.dd<=2) soon.push(x.name); }
+    });
+    if(matched.length>=2) out.push({r,matched,soon,score:matched.length+soon.length*2});
+  });
+  return out.sort((a,b)=>(b.soon.length?1:0)-(a.soon.length?1:0)||b.score-a.score).slice(0,5);
+}
+function renderFridgeSuggest(arr){
+  const el=$("frSuggest"); if(!el) return;
+  const list=arr.length?frsSuggest(arr):[];
+  if(!list.length){ el.innerHTML=""; return; }
+  el.innerHTML=`<div class="savedhdr" style="margin-top:10px">🍳 지금 만들 수 있는 요리 <span>${list.length}</span></div>`+
+    list.map(s=>`<div class="frsug" data-name="${s.r.name}">
+      <div class="fsh"><span class="fsem">${s.r.emoji}</span>
+        <div class="fsn">${s.r.name}${s.soon.length?`<span class="fsbadge">⏰ 임박 재료 소진!</span>`:""}
+          <div class="fsmeta">${s.r.diff} · ${s.r.time} · 내 재료 ${s.matched.length}개 사용</div></div>
+        <span class="fschev">›</span></div>
+      <div class="fschips">${s.matched.map(n=>`<span class="${s.soon.includes(n)?"soon":""}">${s.soon.includes(n)?"⏰ ":""}${n}</span>`).join("")}</div>
+    </div>`).join("");
+  el.querySelectorAll(".frsug").forEach(c=>c.onclick=()=>frsOpenRecipe(c.dataset.name));
+}
+function frsOpenRecipe(name){
+  document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("on", x.dataset.view==="recipe"));
+  document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));
+  $("view-recipe").classList.add("active"); window.scrollTo(0,0);
+  const card=document.querySelector(`#recipeList .rc[data-name="${name}"]`);
+  if(card){ document.querySelectorAll("#recipeList .rc.open").forEach(x=>x.classList.remove("open")); card.classList.add("open");
+    setTimeout(()=>card.scrollIntoView({behavior:"smooth",block:"start"}),80); }
 }
 function fridgeNotify(force){
   const arr=loadFridge().filter(x=>frDday(frUseby(x))<=2);
