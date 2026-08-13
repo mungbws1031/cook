@@ -238,6 +238,37 @@
   .frsug .fschips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
   .frsug .fschips span{font-size:11px;padding:3px 9px;border-radius:999px;background:var(--surface2);border:1px solid var(--border);color:var(--muted)}
   .frsug .fschips span.soon{color:var(--warn);border-color:var(--warn);font-weight:700}
+
+  /* ── 사먹기 ── */
+  .buybar{padding:2px 16px 10px}
+  .buybar .lab{font-family:var(--mono);font-size:10px;letter-spacing:1.4px;color:var(--faint);text-transform:uppercase;margin:10px 0 8px}
+  .buybar .lab:first-child{margin-top:2px}
+  .buyspicy{display:flex;align-items:center;gap:10px;margin-top:4px}
+  .buyspicy input[type=range]{flex:1}
+  .buyspicy .bsval{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--t-spicy);min-width:26px;text-align:right}
+  .buyroll{width:100%;margin-top:14px;font-weight:800;font-size:14px;color:#1a130c;background:var(--accent);
+    border:none;border-radius:13px;padding:13px;cursor:pointer}
+  .buyroll:active{transform:scale(.98)}
+  .buypick{margin:12px 16px;padding:16px;border-radius:16px;background:linear-gradient(135deg,var(--accent-soft),var(--surface));
+    border:1.5px solid var(--accent);text-align:center}
+  .buypick .bpem{font-size:38px;line-height:1}
+  .buypick .bpn{font-size:17px;font-weight:800;color:var(--text);margin-top:4px}
+  .buypick .bpmeta{font-size:12px;color:var(--muted);margin-top:3px}
+  .buylist{padding:4px 16px 16px}
+  .buycard{border:1px solid var(--border);border-radius:14px;background:var(--surface);padding:12px 13px;margin-bottom:9px}
+  .buycard .bch{display:flex;align-items:flex-start;gap:10px}
+  .buycard .bcem{font-size:24px;line-height:1.2}
+  .buycard .bcn{flex:1;font-weight:700;font-size:14px;color:var(--text)}
+  .buycard .bcbrand{font-weight:500;font-size:11.5px;color:var(--faint);margin-top:1px}
+  .buycard .bcnote{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.4}
+  .buycard .bcfav{background:none;border:none;font-size:16px;cursor:pointer;padding:2px}
+  .buycard .bctags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+  .buycard .bctags span{font-size:10.5px;font-weight:700;padding:2.5px 8px;border-radius:999px;background:var(--surface2);border:1px solid var(--border);color:var(--muted)}
+  .buycard .spicy0{color:#3F8F4F}.buycard .spicy1{color:var(--warn)}.buycard .spicy2{color:var(--danger)}
+  .buycard .bcgo{display:flex;gap:8px;margin-top:10px}
+  .buycard .bcgo a{flex:1;text-align:center;text-decoration:none;font-size:12px;font-weight:700;color:var(--text);
+    background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:8px 6px}
+  .buycard .bcgo a:active{transform:scale(.97)}
   .frpaste{margin:2px 16px 6px;border:1px solid var(--border);border-radius:11px;background:var(--surface);overflow:hidden}
   .frpaste summary{padding:11px 13px;font-size:12.5px;font-weight:700;color:var(--text);cursor:pointer;list-style:none}
   .frpaste summary::-webkit-details-marker{display:none}
@@ -508,6 +539,28 @@
     <div id="frSuggest"></div>
   </section>
 
+  <!-- ════════ 사먹기 ════════ -->
+  <section class="view" id="view-buy">
+    <div class="hd">
+      <div class="kicker">Kids Takeout · 사먹는 메뉴</div>
+      <div class="row">
+        <div class="avatar" style="background:linear-gradient(135deg,#F2722B,#B06A22)">🛍️</div>
+        <div><div class="name">오늘은 사먹자</div><div class="sub">쿠팡·이마트·배달에서 아이 메뉴 고르기</div></div>
+      </div>
+    </div>
+    <div class="buybar">
+      <div class="lab">어디서</div>
+      <div class="chips" id="buySrcChips"></div>
+      <div class="lab">종류</div>
+      <div class="chips" id="buyCatChips"></div>
+      <div class="lab">우리 아이 매운 정도</div>
+      <div class="buyspicy"><input type="range" id="buySpicy" min="0" max="10" step="1" value="5" /><span class="bsval" id="buySpicyVal">5</span></div>
+      <button class="buyroll" id="buyRoll">🎲 오늘 뭐 사먹지?</button>
+    </div>
+    <div id="buyPick"></div>
+    <div class="buylist" id="buyList"></div>
+  </section>
+
   <!-- ════════ 저장 ════════ -->
   <section class="view" id="view-saved">
     <div class="hd">
@@ -528,6 +581,7 @@
     <button data-view="sauce"><span class="ic">🥫</span><span class="tx">소스</span></button>
     <button data-view="meal"><span class="ic">📅</span><span class="tx">식단</span></button>
     <button data-view="fridge"><span class="ic">🧊</span><span class="tx">냉장</span></button>
+    <button data-view="buy"><span class="ic">🛍️</span><span class="tx">사먹기</span></button>
     <button data-view="fix"><span class="ic">🩹</span><span class="tx">보정</span></button>
     <button data-view="saved"><span class="ic">★</span><span class="tx">저장</span></button>
   </nav>
@@ -1171,6 +1225,119 @@ function buildRecipes(){ const el=$("recipeList"); if(!el) return;
   el.innerHTML=html; wireRecipeCards(el);
 }
 buildRecipes();
+
+/* ── 사먹기 (쿠팡·이마트·배달) ── */
+const BUY_SRC=[["all","전체"],["coupang","🛒 쿠팡"],["emart","🏬 이마트"],["delivery","🛵 배달"]];
+const BUY_CAT=[["all","전체"],["rice","밥·한끼"],["chicken","치킨"],["pizza_burger","피자·버거"],["bunsik","분식"],["snack","간식·디저트"]];
+const BUY_ITEMS=[
+  {emoji:"🍱",name:"곰곰 함박스테이크",brand:"곰곰 · 쿠팡",src:"coupang",cat:"rice",spicy:0,age:"3세+",price:"~1만원대",note:"전자레인지 5분, 데미글라스 소스가 순해요"},
+  {emoji:"🥟",name:"풀무원 생가득 만두",brand:"풀무원 · 쿠팡",src:"coupang",cat:"rice",spicy:0,age:"2세+",price:"~1만원대",note:"찐만두로 하면 부드럽고 순해요"},
+  {emoji:"🍗",name:"하림 순살 치킨너겟",brand:"하림 · 쿠팡",src:"coupang",cat:"snack",spicy:0,age:"2세+",price:"~1만원대",note:"에어프라이어 바삭, 케첩 곁들이면 완벽"},
+  {emoji:"🍛",name:"오뚜기 어린이 카레",brand:"오뚜기 · 쿠팡",src:"coupang",cat:"rice",spicy:1,age:"3세+",price:"~5천원대",note:"순한맛, 채소 건더기가 많아요"},
+  {emoji:"🍖",name:"곰곰 떡갈비",brand:"곰곰 · 쿠팡",src:"coupang",cat:"rice",spicy:0,age:"2세+",price:"~1만원대",note:"달콤짭짤, 굽기만 하면 끝"},
+  {emoji:"🍝",name:"곰곰 소고기 미트볼",brand:"곰곰 · 쿠팡",src:"coupang",cat:"rice",spicy:0,age:"3세+",price:"~1만원대",note:"토마토소스 파스타에 얹으면 인기"},
+  {emoji:"🧇",name:"곰곰 동그랑땡",brand:"곰곰 · 쿠팡",src:"coupang",cat:"rice",spicy:0,age:"2세+",price:"~1만원대",note:"밥반찬 스테디셀러"},
+  {emoji:"🍚",name:"오뚜기 컵밥 짜장",brand:"오뚜기 · 쿠팡",src:"coupang",cat:"rice",spicy:0,age:"4세+",price:"~3천원대",note:"순한 짜장, 전자레인지 3분"},
+  {emoji:"🧀",name:"고메 치즈돈까스",brand:"CJ고메 · 쿠팡",src:"coupang",cat:"snack",spicy:0,age:"3세+",price:"~1만원대",note:"치즈 쭉 늘어나 아이들이 좋아해요"},
+  {emoji:"🍜",name:"곰곰 옛날우동",brand:"곰곰 · 쿠팡",src:"coupang",cat:"rice",spicy:0,age:"3세+",price:"~5천원대",note:"국물 맑고 안 매워요"},
+  {emoji:"🌽",name:"곰곰 콘스프",brand:"곰곰 · 쿠팡",src:"coupang",cat:"snack",spicy:0,age:"2세+",price:"~3천원대",note:"데우기만 하면 되는 부드러운 스프"},
+  {emoji:"🍇",name:"델몬트 과일컵",brand:"델몬트 · 쿠팡",src:"coupang",cat:"snack",spicy:0,age:"1세+",price:"~1만원대(멀티팩)",note:"무가당 제품인지 확인하고 구매하세요"},
+  {emoji:"🥣",name:"비비고 소고기 야채죽",brand:"CJ비비고 · 쿠팡",src:"coupang",cat:"rice",spicy:0,age:"1세+",price:"~1만원대",note:"이유식 졸업 후에도 좋은 부드러운 죽"},
+  {emoji:"🍙",name:"곰곰 김치볶음밥",brand:"곰곰 · 쿠팡",src:"coupang",cat:"rice",spicy:2,age:"4세+",price:"~5천원대",note:"순한 김치로 만들어 아이도 잘 먹어요"},
+  {emoji:"🍞",name:"곰곰 우유식빵",brand:"곰곰 · 쿠팡",src:"coupang",cat:"snack",spicy:0,age:"1세+",price:"~3천원대",note:"잼 발라주면 간식으로 좋아요"},
+  {emoji:"🥚",name:"하림 계란찜",brand:"하림 · 쿠팡",src:"coupang",cat:"rice",spicy:0,age:"1세+",price:"~5천원대",note:"전자레인지로 폭신하게, 밥반찬 필수템"},
+  {emoji:"🍡",name:"곰곰 인절미",brand:"곰곰 · 쿠팡",src:"coupang",cat:"snack",spicy:0,age:"3세+",price:"~5천원대",note:"콩고물 든든 간식, 잘게 잘라 목 막힘 주의"},
+  {emoji:"🍕",name:"고메 미니피자",brand:"CJ고메 · 쿠팡",src:"coupang",cat:"pizza_burger",spicy:0,age:"3세+",price:"~1만원대",note:"에어프라이어 8분, 한입 크기라 편해요"},
+  {emoji:"🍕",name:"노브랜드 콤비네이션 피자",brand:"노브랜드 · 이마트",src:"emart",cat:"pizza_burger",spicy:0,age:"3세+",price:"~1만원대",note:"토핑 심플해서 안 자극적이에요"},
+  {emoji:"🦕",name:"노브랜드 공룡 치킨너겟",brand:"노브랜드 · 이마트",src:"emart",cat:"snack",spicy:0,age:"2세+",price:"~1만원대",note:"공룡·별 모양이라 아이가 좋아해요"},
+  {emoji:"🍲",name:"피코크 떡볶이 순한맛",brand:"피코크 · 이마트",src:"emart",cat:"bunsik",spicy:2,age:"4세+",price:"~5천원대",note:"매운맛 단계 조절 가능, 순한맛부터 시작"},
+  {emoji:"🍛",name:"피코크 어린이 카레",brand:"피코크 · 이마트",src:"emart",cat:"rice",spicy:1,age:"3세+",price:"~5천원대",note:"자극 적은 순한맛"},
+  {emoji:"🍔",name:"노브랜드 미니버거",brand:"노브랜드 · 이마트",src:"emart",cat:"pizza_burger",spicy:0,age:"3세+",price:"~1만원대",note:"한입 크기, 패티가 부드러워요"},
+  {emoji:"🥟",name:"피코크 왕교자",brand:"피코크 · 이마트",src:"emart",cat:"rice",spicy:0,age:"2세+",price:"~1만원대",note:"큼직한 만두, 쪄서 주면 순해요"},
+  {emoji:"🍜",name:"피코크 잔치국수",brand:"피코크 · 이마트",src:"emart",cat:"rice",spicy:0,age:"3세+",price:"~5천원대",note:"국물 슴슴, 후루룩 먹기 좋아요"},
+  {emoji:"🍗",name:"이마트 델리 후라이드",brand:"이마트 델리",src:"emart",cat:"chicken",spicy:0,age:"3세+",price:"~1만원대",note:"매장 즉석 후라이드, 안 매워요"},
+  {emoji:"🍳",name:"피코크 소고기 오므라이스",brand:"피코크 · 이마트",src:"emart",cat:"rice",spicy:0,age:"3세+",price:"~5천원대",note:"케첩밥+계란, 아이 인기 메뉴"},
+  {emoji:"🍮",name:"노브랜드 푸딩",brand:"노브랜드 · 이마트",src:"emart",cat:"snack",spicy:0,age:"2세+",price:"~3천원대",note:"부드러운 식감, 후식으로 좋아요"},
+  {emoji:"🍢",name:"피코크 어묵탕",brand:"피코크 · 이마트",src:"emart",cat:"bunsik",spicy:1,age:"4세+",price:"~5천원대",note:"국물 슴슴, 꼬치는 아이용으로 잘라주기"},
+  {emoji:"🍦",name:"노브랜드 바닐라 아이스크림",brand:"노브랜드 · 이마트",src:"emart",cat:"snack",spicy:0,age:"2세+",price:"~5천원대",note:"무난한 기본 맛"},
+  {emoji:"🍗",name:"BBQ 황금올리브 순살",brand:"BBQ · 배달",src:"delivery",cat:"chicken",spicy:0,age:"4세+",price:"~2만원대",note:"올리브유 튀김, 순한맛 대표주자"},
+  {emoji:"🍗",name:"BHC 뿌링클(순살)",brand:"BHC · 배달",src:"delivery",cat:"chicken",spicy:3,age:"5세+",price:"~2만원대",note:"단짠 치즈맛, 매운 정도는 약~중간"},
+  {emoji:"🌶️",name:"굽네 고추바사삭",brand:"굽네 · 배달",src:"delivery",cat:"chicken",spicy:7,age:"7세+",price:"~2만원대",note:"이름 그대로 매워요, 매운맛 약한 아이는 피하세요"},
+  {emoji:"🍯",name:"교촌 허니콤보",brand:"교촌 · 배달",src:"delivery",cat:"chicken",spicy:1,age:"4세+",price:"~2만원대",note:"달콤한 허니가 반, 순살 부위 먼저 주기"},
+  {emoji:"🍟",name:"도미노 포테이토 골드",brand:"도미노피자 · 배달",src:"delivery",cat:"pizza_burger",spicy:0,age:"3세+",price:"~2만원대",note:"피자보다 순한 사이드로 시작하기 좋아요"},
+  {emoji:"🍕",name:"미스터피자 아이스포테이토",brand:"미스터피자 · 배달",src:"delivery",cat:"pizza_burger",spicy:0,age:"3세+",price:"~2만원대",note:"고구마무스+감자, 안 매워요"},
+  {emoji:"🍔",name:"맘스터치 싸이버거(순한맛)",brand:"맘스터치 · 배달",src:"delivery",cat:"pizza_burger",spicy:0,age:"4세+",price:"~1만원대",note:"소스 빼고 주문하면 더 순해요"},
+  {emoji:"🍔",name:"맥도날드 해피밀 불고기버거",brand:"맥도날드 · 배달",src:"delivery",cat:"pizza_burger",spicy:0,age:"3세+",price:"~1만원대",note:"장난감 포함, 순한 불고기 소스"},
+  {emoji:"🍙",name:"김밥천국 계란김밥",brand:"김밥천국 · 배달",src:"delivery",cat:"bunsik",spicy:0,age:"2세+",price:"~5천원대",note:"기본 중의 기본, 실패 없어요"},
+  {emoji:"🥣",name:"본죽 어린이 야채죽",brand:"본죽 · 배달",src:"delivery",cat:"rice",spicy:0,age:"1세+",price:"~1만원대",note:"유아식 전환기에도 좋아요"},
+  {emoji:"🍲",name:"죠스떡볶이 순한맛",brand:"죠스떡볶이 · 배달",src:"delivery",cat:"bunsik",spicy:2,age:"5세+",price:"~1만원대",note:"매운맛 단계 선택 가능, 순한맛으로 주문"},
+  {emoji:"🌹",name:"신전떡볶이 로제",brand:"신전떡볶이 · 배달",src:"delivery",cat:"bunsik",spicy:2,age:"5세+",price:"~1만원대",note:"크림이 들어가 덜 자극적이에요"},
+  {emoji:"🍜",name:"잔치국수(동네 분식집)",brand:"분식집 · 배달",src:"delivery",cat:"bunsik",spicy:0,age:"3세+",price:"~7천원대",note:"국물 슴슴, 후루룩 먹기 좋아요"},
+  {emoji:"🥡",name:"짜장면(중국집)",brand:"중국집 · 배달",src:"delivery",cat:"rice",spicy:0,age:"4세+",price:"~1만원대",note:"단짠 춘장 소스, 아이들 단골 메뉴"},
+  {emoji:"🍥",name:"우동(중국집·분식집)",brand:"분식집 · 배달",src:"delivery",cat:"rice",spicy:0,age:"3세+",price:"~1만원대",note:"국물 맑고 부드러운 면"},
+  {emoji:"🍣",name:"어린이 초밥세트",brand:"초밥집 · 배달",src:"delivery",cat:"rice",spicy:0,age:"5세+",price:"~2만원대",note:"날생선 대신 계란·게맛살 위주로 주문하기"},
+  {emoji:"🍦",name:"배스킨라빈스 킷즈컵",brand:"배스킨라빈스 · 배달",src:"delivery",cat:"snack",spicy:0,age:"3세+",price:"~1만원대",note:"작은 사이즈라 양 조절하기 좋아요"},
+  {emoji:"🥯",name:"소보로빵",brand:"베이커리 · 배달",src:"delivery",cat:"snack",spicy:0,age:"2세+",price:"~3천원대",note:"달콤한 기본 간식빵"}
+];
+function buySpicyLevel(s){ return s<=2?"spicy0":s<=5?"spicy1":"spicy2"; }
+const BUY_FAV_KEY="et_buyfav";
+function loadBuyFav(){ try{ return JSON.parse(localStorage.getItem(BUY_FAV_KEY)||"[]"); }catch(e){ return []; } }
+function saveBuyFav(a){ try{ localStorage.setItem(BUY_FAV_KEY, JSON.stringify(a)); }catch(e){} }
+function isBuyFav(name){ return loadBuyFav().includes(name); }
+function toggleBuyFav(name){ let a=loadBuyFav(); a=a.includes(name)?a.filter(x=>x!==name):[name,...a]; saveBuyFav(a); buildBuy(); }
+let buySrcFilter="all", buyCatFilter="all";
+function buyFiltered(){
+  const cap=parseInt($("buySpicy").value)||0;
+  return BUY_ITEMS.filter(it=>
+    (buySrcFilter==="all"||it.src===buySrcFilter) &&
+    (buyCatFilter==="all"||it.cat===buyCatFilter) &&
+    it.spicy<=cap
+  );
+}
+function buySearchLinks(it){
+  const q=encodeURIComponent(it.name);
+  if(it.src==="coupang") return [["🛒 쿠팡에서 찾기","https://www.coupang.com/np/search?q="+q]];
+  if(it.src==="emart") return [["🏬 이마트몰에서 찾기","https://emart.ssg.com/search.ssg?target=all&query="+q]];
+  return [["🛵 배달앱에서 찾기","https://www.google.com/search?q="+encodeURIComponent(it.brand+" "+it.name+" 배달")]];
+}
+function buyCardHTML(it){
+  const lv=buySpicyLevel(it.spicy);
+  const spicyTxt=it.spicy===0?"안 매워요":"맵기 "+it.spicy+"/10";
+  const links=buySearchLinks(it);
+  return `<div class="buycard" data-name="${it.name}">
+    <div class="bch"><span class="bcem">${it.emoji}</span>
+      <div style="flex:1"><div class="bcn">${it.name}</div><div class="bcbrand">${it.brand}</div></div>
+      <button class="bcfav" data-name="${it.name}" aria-label="찜">${isBuyFav(it.name)?"❤️":"🤍"}</button>
+    </div>
+    <div class="bcnote">${it.note}</div>
+    <div class="bctags"><span class="${lv}">${spicyTxt}</span><span>${it.age}</span><span>${it.price}</span></div>
+    <div class="bcgo">${links.map(([t,u])=>`<a href="${u}" target="_blank" rel="noopener">${t}</a>`).join("")}</div>
+  </div>`;
+}
+function buildBuy(){
+  const scEl=$("buySrcChips"), ccEl=$("buyCatChips");
+  if(scEl&&!scEl.childElementCount) scEl.innerHTML=BUY_SRC.map(([k,l])=>`<button class="chip${k===buySrcFilter?" on":""}" data-src="${k}">${l}</button>`).join("");
+  if(ccEl&&!ccEl.childElementCount) ccEl.innerHTML=BUY_CAT.map(([k,l])=>`<button class="chip${k===buyCatFilter?" on":""}" data-cat="${k}">${l}</button>`).join("");
+  const list=buyFiltered().sort((a,b)=>(isBuyFav(b.name)?1:0)-(isBuyFav(a.name)?1:0));
+  const el=$("buyList");
+  el.innerHTML=list.length?list.map(buyCardHTML).join(""):`<div class="empty" style="padding:30px 20px">이 조건에 맞는 메뉴가 없어요.<br>맵기 상한을 올리거나 필터를 바꿔보세요.</div>`;
+  el.querySelectorAll(".bcfav").forEach(b=>b.onclick=e=>{ e.stopPropagation(); toggleBuyFav(b.dataset.name); });
+}
+function buyRoll(){
+  const list=buyFiltered();
+  const pk=$("buyPick");
+  if(!list.length){ pk.innerHTML=""; alert("이 조건에 맞는 메뉴가 없어요 😅\n맵기 상한을 올리거나 필터를 바꿔보세요."); return; }
+  const it=list[Math.floor(Math.random()*list.length)];
+  pk.innerHTML=`<div class="buypick"><div class="bpem">${it.emoji}</div><div class="bpn">${it.name}</div>
+    <div class="bpmeta">${it.brand} · ${it.spicy===0?"안 매워요":"맵기 "+it.spicy+"/10"} · ${it.age}</div></div>`;
+}
+$("buySrcChips").addEventListener("click", e=>{ const b=e.target.closest(".chip"); if(!b) return; buySrcFilter=b.dataset.src;
+  $("buySrcChips").querySelectorAll(".chip").forEach(c=>c.classList.toggle("on",c===b)); buildBuy(); });
+$("buyCatChips").addEventListener("click", e=>{ const b=e.target.closest(".chip"); if(!b) return; buyCatFilter=b.dataset.cat;
+  $("buyCatChips").querySelectorAll(".chip").forEach(c=>c.classList.toggle("on",c===b)); buildBuy(); });
+$("buySpicy").addEventListener("input", e=>{ $("buySpicyVal").textContent=e.target.value; buildBuy(); });
+$("buyRoll").addEventListener("click", buyRoll);
+buildBuy();
 
 /* ── 소스 배합소 ── */
 const SAUCE_DENS={"간장":1.15,"설탕":0.85,"고추장":1.2,"고춧가루":0.5,"올리고당":1.35,"물엿":1.35,"꿀":1.4,"케첩":1.1,"마요네즈":0.95,"식초":1.0,"다진마늘":1.0,"버터":0.96,"우유/생크림":1.0,"다시다":0.65,"두반장":1.2,"마라소스":1.0,"청양고추":1.0,"후추":0.5,"화자오":0.5,"카레가루":0.5,"참기름":0.92,"통깨":0.6,"물":1.0,"된장":1.15,"생강":1.0,"미림":1.0,"춘장":1.2,"굴소스":1.2,"식용유":0.92,"양파":1.0,"머스터드":1.0,"레몬즙":1.0,"우스터소스":1.1,"피클":1.0,"파마산치즈":1.0,"소금":1.2,"사과즙":1.0,"적포도주":1.0,"와사비":1.0};
