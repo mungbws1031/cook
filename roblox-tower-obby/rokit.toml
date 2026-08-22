@@ -1,0 +1,4 @@
+# Rokit 툴체인 (rokit install 로 설치)
+[tools]
+rojo = "rojo-rbx/rojo@7.4.4"
+stylua = "JohnnyMorganz/StyLua@0.20.0"

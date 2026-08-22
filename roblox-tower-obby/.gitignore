@@ -1,0 +1,10 @@
+# Rojo / Roblox
+*.rbxl
+*.rbxlx
+*.rbxl.lock
+*.rbxlx.lock
+sourcemap.json
+
+# 에디터
+.vscode/
+.DS_Store
